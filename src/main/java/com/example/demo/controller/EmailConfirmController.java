@@ -10,19 +10,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import com.example.demo.response.ApiResponse;
-import com.example.demo.service.UserRegisterService;
+import com.example.demo.service.UserService;
 
 @Controller
 @RequestMapping("/tiann/email")
 public class EmailConfirmController {
 
 	@Autowired
-	UserRegisterService userRegisterService;
+	UserService userService;
 
 	@GetMapping("/{username}/confirm")
 	public ResponseEntity<ApiResponse<String>> emailConfirm(
 			@PathVariable String username, @RequestParam String token) {
-		if(userRegisterService.emailConfirm(username,token)) {
+		if(userService.emailConfirm(username,token)) {
 			return ResponseEntity.ok(ApiResponse.success("信箱驗證成功"));
 		}
 		return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"信箱驗證錯誤"));

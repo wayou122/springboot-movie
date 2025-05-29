@@ -10,60 +10,43 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name="users")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Review {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column
-	private Integer userId;
+	private Integer reviewId;
 	
-	@Column(unique = true, nullable = false)
-	private String username;
+	@ManyToOne
+	@JoinColumn(name="user_id")
+	private User user;
 	
-	@Column(unique = true, nullable = false)
-	private String email;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name="movie_id")
+	private Movie movie;
 	
-	@Column
-	private Boolean emailVerf = false;
-	
-	@Column(nullable=false)
-	private String passwordHash;
+	@Column(nullable = false, columnDefinition = "TEXT")
+	private String content;
 	
 	@Column(nullable = false)
-	private String salt;
+	private Integer score;
 	
-	@Column
-	private String role = "user";
-	
-	@OneToMany(mappedBy = "user")
-	private List<Review> reviews;
-	
-	@ManyToMany
-	@JoinTable(name="watchlist",
-	joinColumns = @JoinColumn(name="user_id"),
-	inverseJoinColumns = @JoinColumn(name="movie_id"))
-	private List<Movie> watchlist;
-	
-	@OneToMany(mappedBy = "user")
-	private List<ReviewReaction> likes;
+	@OneToMany(mappedBy = "review")
+	private List<ReviewReaction> reactions;
 	
 	@Column(nullable = false)
 	@CreatedDate
@@ -72,7 +55,4 @@ public class User {
 	@Column(nullable = false)
 	@LastModifiedDate
 	private LocalDateTime modifiedDate;
-	
-	@Column
-	private String emailVerfToken;
 }

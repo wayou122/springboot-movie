@@ -22,7 +22,6 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/tiann")
-@CrossOrigin(origins= {"http://localhost:5173"}, allowCredentials = "true")
 public class LoginController {
 
 	@Autowired

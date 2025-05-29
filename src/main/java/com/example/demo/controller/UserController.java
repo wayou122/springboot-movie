@@ -1,16 +1,21 @@
 package com.example.demo.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.model.dto.MovieCardDto;
 import com.example.demo.model.dto.UserCert;
 import com.example.demo.model.dto.UserDto;
 import com.example.demo.model.dto.UserUpdateDto;
@@ -26,23 +31,11 @@ public class UserController {
 	@Autowired
 	private UserService userService;
 	
-	@GetMapping("/info")
+	@GetMapping("/account")
 	public ResponseEntity<ApiResponse<UserDto>> info(HttpSession httpSession){
 		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
 		UserDto userDto = userService.getUserById(userCert.getUserId()); 
 		return ResponseEntity.ok(ApiResponse.success("使用者資訊",userDto));
-	}
-	
-	@GetMapping("/check-username")
-	public ResponseEntity<ApiResponse<Boolean>> checkUsername(
-			@RequestParam String newUsername, HttpSession httpSession) {
-		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
-		Boolean isExisted = userService.existsByUsername(newUsername);
-		if (newUsername.equals(userCert.getUsername()) || isExisted == false) {
-			return ResponseEntity.ok(ApiResponse.success("名稱可用",true));			
-		}else {
-			return ResponseEntity.ok(ApiResponse.success("名稱重複",false));
-		}
 	}
 	
 	@PutMapping("/update-username")
@@ -68,6 +61,23 @@ public class UserController {
 			}
 		}
 		return ResponseEntity.ok(ApiResponse.success("修改成功",null));
+	}
+	
+	@GetMapping("/watchlist")
+	public ResponseEntity<ApiResponse<List<MovieCardDto>>> aaa(HttpSession httpSession){
+		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
+		Integer userId = userCert.getUserId();
+		List<MovieCardDto> dtos = userService.getWatchlist(userId);
+		return ResponseEntity.ok(ApiResponse.success("查詢成功",dtos));
+	}
+	
+	@PutMapping("/toggle-watchlist/movie/{movieId}")
+	public ResponseEntity<ApiResponse<Boolean>> toggleMovieForWatchlist(
+			 @PathVariable Integer movieId, HttpSession httpSession){
+		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
+		Integer userId = userCert.getUserId();
+		Boolean added = userService.toggleMovieForWatchlist(userId, movieId);
+		return ResponseEntity.ok(ApiResponse.success(added));
 	}
 	
 }

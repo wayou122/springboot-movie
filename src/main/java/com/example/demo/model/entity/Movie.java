@@ -1,6 +1,8 @@
 package com.example.demo.model.entity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.annotation.CreatedDate;
@@ -13,57 +15,55 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Table(name="users")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class User {
+public class Movie {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column
-	private Integer userId;
-	
-	@Column(unique = true, nullable = false)
-	private String username;
-	
-	@Column(unique = true, nullable = false)
-	private String email;
-	
-	@Column
-	private Boolean emailVerf = false;
-	
-	@Column(nullable=false)
-	private String passwordHash;
+	private Integer movieId;
 	
 	@Column(nullable = false)
-	private String salt;
+	private String title;
 	
 	@Column
-	private String role = "user";
+	private LocalDate releaseDate;
 	
-	@OneToMany(mappedBy = "user")
-	private List<Review> reviews;
+	@Column(columnDefinition = "TEXT")
+	private String summary;
 	
-	@ManyToMany
-	@JoinTable(name="watchlist",
-	joinColumns = @JoinColumn(name="user_id"),
-	inverseJoinColumns = @JoinColumn(name="movie_id"))
-	private List<Movie> watchlist;
+	@Column
+	private String type;
 	
-	@OneToMany(mappedBy = "user")
-	private List<ReviewReaction> likes;
+	@Column
+	private Integer length;
+	
+	@Column
+	private String bannerUrl;
+	
+	@Column
+	private String posterUrl;
+	
+	@Column
+	private String director;
+	
+	@Column
+	private String actor;
+	
+	@Column
+	private String rating;
+	
+	@ManyToMany(mappedBy = "watchlist")
+	private List<User> watchlistUsers;	
 	
 	@Column(nullable = false)
 	@CreatedDate
@@ -73,6 +73,15 @@ public class User {
 	@LastModifiedDate
 	private LocalDateTime modifiedDate;
 	
-	@Column
-	private String emailVerfToken;
+	@OneToMany(mappedBy = "movie")
+	private List<Review> reviews;
+	
+	@Override
+	public boolean equals(Object o) {
+		if (this==o) return true;
+		if (!(o instanceof Movie)) return false;
+		Movie other = (Movie) o;
+		return movieId != null && movieId.equals(other.getMovieId());
+	}
+	
 }

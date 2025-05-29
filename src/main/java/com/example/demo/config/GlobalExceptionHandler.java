@@ -7,6 +7,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.demo.exception.movieException.MovieException;
+import com.example.demo.exception.reivewException.ReviewException;
 import com.example.demo.exception.userException.UserException;
 import com.example.demo.exception.userException.UserExistedException;
 import com.example.demo.exception.userException.UserNotFoundException;
@@ -20,7 +22,17 @@ public class GlobalExceptionHandler {
 	}
 	
 	@ExceptionHandler(UserException.class)
-	public ResponseEntity<ApiResponse<Void>> handleUserUserExistedException(UserException e){
+	public ResponseEntity<ApiResponse<Void>> handleUserException(UserException e){
+		return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST, e.getMessage()));
+	}
+	
+	@ExceptionHandler(MovieException.class)
+	public ResponseEntity<ApiResponse<Void>> handleMovieException(MovieException e){
+		return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST, e.getMessage()));
+	}
+	
+	@ExceptionHandler(ReviewException.class)
+	public ResponseEntity<ApiResponse<Void>> handleReviewException(ReviewException e){
 		return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST, e.getMessage()));
 	}
 	
