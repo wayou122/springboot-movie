@@ -10,12 +10,14 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.dto.MovieCardDto;
+import com.example.demo.model.dto.MoviesFilterDto;
 import com.example.demo.model.dto.UserCert;
 import com.example.demo.model.dto.UserDto;
 import com.example.demo.model.dto.UserUpdateDto;
@@ -33,6 +35,9 @@ public class UserController {
 	
 	@GetMapping("/account")
 	public ResponseEntity<ApiResponse<UserDto>> info(HttpSession httpSession){
+		if (httpSession.getAttribute("userCert") == null) {
+			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"尚未登入"));
+		}
 		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
 		UserDto userDto = userService.getUserById(userCert.getUserId()); 
 		return ResponseEntity.ok(ApiResponse.success("使用者資訊",userDto));
@@ -63,8 +68,12 @@ public class UserController {
 		return ResponseEntity.ok(ApiResponse.success("修改成功",null));
 	}
 	
-	@GetMapping("/watchlist")
-	public ResponseEntity<ApiResponse<List<MovieCardDto>>> aaa(HttpSession httpSession){
+	@PostMapping("/watchlist")
+	public ResponseEntity<ApiResponse<List<MovieCardDto>>> aaa(
+			@ModelAttribute MoviesFilterDto moviesFilterDto, HttpSession httpSession){
+		if (httpSession.getAttribute("userCert") == null) {
+			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"尚未登入"));
+		}
 		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
 		Integer userId = userCert.getUserId();
 		List<MovieCardDto> dtos = userService.getWatchlist(userId);
@@ -74,6 +83,9 @@ public class UserController {
 	@PutMapping("/toggle-watchlist/movie/{movieId}")
 	public ResponseEntity<ApiResponse<Boolean>> toggleMovieForWatchlist(
 			 @PathVariable Integer movieId, HttpSession httpSession){
+		if (httpSession.getAttribute("userCert") == null) {
+			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"尚未登入"));
+		}
 		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
 		Integer userId = userCert.getUserId();
 		Boolean added = userService.toggleMovieForWatchlist(userId, movieId);

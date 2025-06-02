@@ -22,7 +22,6 @@ public class AuthcodeController {
 		String authcode = authcodeService.generateAuthcode();
 		byte[] img = authcodeService.generateAuthcodeImg(authcode);
 		httpSession.setAttribute("authcode",authcode);
-		System.out.println(authcode);
 		return img;
 	}
 	

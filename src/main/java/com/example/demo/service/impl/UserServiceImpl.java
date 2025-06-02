@@ -142,9 +142,9 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<MovieCardDto> getWatchlist(Integer userId) {
-		List<Integer> movieIds = userRepository.findWatchListMoveIdById(userId);
+		List<Integer> movieIds = userRepository.findWatchlistMovieIds(userId);
 		List<Movie> movies = movieRepository.findAllWithReviewsByIds(movieIds);
-		List<MovieCardDto> dtos = movies.stream().map(m->movieService.toCardDto(m)).toList();
+		List<MovieCardDto> dtos = movieService.toCardDtoList(movies, userId);
 		return dtos;
 	}
 	

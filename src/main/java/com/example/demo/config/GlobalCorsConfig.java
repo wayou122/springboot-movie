@@ -12,7 +12,7 @@ public class GlobalCorsConfig implements WebMvcConfigurer {
 		registry.addMapping("/**") // 對所有路徑有效
 				.allowedOrigins("http://localhost:5173") // 允許的來源
 				.allowCredentials(true) // 允許攜帶 cookie
-				.allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // 允許的 HTTP 方法
+				.allowedMethods("GET", "POST", "PUT","PATCH", "DELETE", "OPTIONS") // 允許的 HTTP 方法
 				.allowedHeaders("*"); // 允許的 headers
 	}
 }

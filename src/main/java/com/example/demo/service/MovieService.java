@@ -3,19 +3,28 @@ package com.example.demo.service;
 import java.util.List;
 
 import com.example.demo.model.dto.MovieDto;
+import com.example.demo.model.dto.MoviesFilterDto;
 import com.example.demo.model.entity.Movie;
 import com.example.demo.model.dto.MovieCardDto;
 
 public interface MovieService {
-	List<MovieCardDto> findAll();
-	List<MovieCardDto> findByTitle(String title);
-	List<MovieCardDto> findByType(String type);
-	MovieDto findById(Integer movieId);
+	List<MovieCardDto> findAll(Integer userId);
+	List<MovieCardDto> findByTitle(String title,Integer userId);
+	List<MovieCardDto> getFilteredMovies(MoviesFilterDto moviesFilterDto, Integer userId);
+	List<MovieCardDto> findByType(String type, Integer userId);
+	List<MovieCardDto> findByFilter(MoviesFilterDto moviesFilterDto, Integer userId);
+	List<MovieCardDto> findWatchlist(Integer userId);
+	List<MovieCardDto> findWatchlistByFilter(MoviesFilterDto moviesFilterDto, Integer userId);
+
+	MovieDto findById(Integer movieId, Integer userId);
 	void add(MovieDto movieDto);
 	void addAll(List<MovieDto> movieDtos);
 	Integer calculateReviewCount(Movie movie);
 	Double calculateScoreAvg(Movie movie);
-	MovieDto toDto(Movie movie);
-	MovieCardDto toCardDto(Movie movie);
+	List<MovieCardDto> toCardDtoList(List<Movie> movies, Integer userId);
+	List<MovieDto> toDtoList(List<Movie> movies, Integer userId);
+	MovieDto toDto(Movie movie, Integer usrId);
+	MovieCardDto toCardDto(Movie movie, Integer usrId);
+	
 
 }

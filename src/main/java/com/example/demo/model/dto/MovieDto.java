@@ -26,4 +26,5 @@ public class MovieDto {
 	private Double scoreAvg;
 	private Integer reviewCount;
 	private List<ReviewDto> reviews;
+	private Boolean collected;
 }

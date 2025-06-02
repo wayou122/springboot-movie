@@ -18,4 +18,5 @@ public class MovieCardDto {
 	private String rating;
 	private Double scoreAvg;
 	private Integer reviewCount;
+	private Boolean collected;
 }

@@ -29,8 +29,7 @@ public class LoginController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<ApiResponse<Void>> postLogin(
-			@ModelAttribute @Valid UserLoginDto userLoginDto,
-			HttpSession httpSession){
+			@ModelAttribute @Valid UserLoginDto userLoginDto,	HttpSession httpSession){
 		//確認登入狀態
 		if (httpSession.getAttribute("userCert")!=null) {
 			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"已經登入"));
@@ -47,8 +46,7 @@ public class LoginController {
 	}
 	
 	@GetMapping("/logout")
-	public ResponseEntity<ApiResponse<Void>> logout(
-			HttpSession httpSession){
+	public ResponseEntity<ApiResponse<Void>> logout(HttpSession httpSession){
 		//確認登出狀態
 		if (httpSession.getAttribute("userCert")==null) {
 			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"已經登出"));
