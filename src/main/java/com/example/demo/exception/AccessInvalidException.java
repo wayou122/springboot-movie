@@ -4,4 +4,5 @@ public class AccessInvalidException extends RuntimeException {
 	public AccessInvalidException(String message) {
 		super(message);
 	}
+	
 }

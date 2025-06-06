@@ -2,9 +2,13 @@ package com.example.demo.model.dto;
 
 import java.time.LocalDate;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class MovieCardDto {
 	private Integer movieId;
 	private String title;
@@ -17,6 +21,6 @@ public class MovieCardDto {
 	private String actor;
 	private String rating;
 	private Double scoreAvg;
-	private Integer reviewCount;
+	private Long reviewCount;
 	private Boolean collected;
 }

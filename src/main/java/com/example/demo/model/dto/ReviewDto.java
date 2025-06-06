@@ -9,7 +9,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ReviewDto {
 	private Integer reviewId;
+	private String authorName;
+	private Integer authorId;
 	private String content;
 	private Integer score;
-	private Integer good;
+	private Integer likeCount;
+	private Integer reaction;
+	private String createdDate;
 }

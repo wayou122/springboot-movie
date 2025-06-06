@@ -10,5 +10,6 @@ import lombok.NoArgsConstructor;
 public class MoviesFilterDto {
 	private String sort;
 	private String type;
+	private String keyword;
 	private Boolean watchlist;
 }

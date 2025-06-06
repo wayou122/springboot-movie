@@ -16,7 +16,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	Optional<User> findByEmail(String email);
 	Boolean existsByUsername(String username);
 	
-	@Query("SELECT u FROM User u LEFT JOIN FETCH u.watchlist WHERE u.userId = :userId")
+	@Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.watchlist WHERE u.userId = :userId")
 	Optional<User> findByIdWithWatchlist(Integer userId);
 	
 	@Query("SELECT w.movieId FROM User u JOIN u.watchlist w WHERE u.userId = :userId")

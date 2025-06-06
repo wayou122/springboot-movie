@@ -24,7 +24,7 @@ public class MovieDto {
 	private String actor;
 	private String rating;
 	private Double scoreAvg;
-	private Integer reviewCount;
+	private Long reviewCount;
 	private List<ReviewDto> reviews;
 	private Boolean collected;
 }

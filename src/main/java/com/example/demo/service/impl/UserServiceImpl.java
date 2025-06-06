@@ -44,7 +44,6 @@ public class UserServiceImpl implements UserService {
 		return userMapper.toDto(optUser.get());
 	}
 	
-
 	@Override
 	public String addUser(UserRegisterDto userRegisterDto) {
 		String username = userRegisterDto.getUsername();

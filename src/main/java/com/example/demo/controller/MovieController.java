@@ -2,7 +2,12 @@ package com.example.demo.controller;
 
 import java.util.List;
 
+import org.hibernate.internal.build.AllowSysOut;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -29,25 +34,60 @@ public class MovieController {
 	private MovieService movieService;
 
 	@GetMapping
-	public ResponseEntity<ApiResponse<List<MovieCardDto>>> getAllMovies(HttpSession httpSession) {
+	public ResponseEntity<ApiResponse<Page<MovieCardDto>>> getAllMovieCardDto (
+			HttpSession httpSession,
+			@RequestParam(defaultValue = "1") String page,
+			@RequestParam(defaultValue = "all") String type){
+		//使用者資訊
 		Integer userId = null;
 		if (httpSession.getAttribute("userCert") != null) {
 			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
 		}
-		List<MovieCardDto> movies = movieService.findAll(userId);
-		return ResponseEntity.ok(ApiResponse.success(movies));
+		
+		// 頁數
+		Integer pageInteger = 1;
+		try {
+			pageInteger = Integer.parseInt(page);
+		}catch(NumberFormatException e) {
+			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"參數錯誤"));
+		}
+		Pageable pageable = PageRequest.of(pageInteger - 1, 10);
+		
+		Page<MovieCardDto> dtos = movieService.getMovieCardDtosPage(userId, pageable, type);
+		return ResponseEntity.ok(ApiResponse.success(dtos));
 	}
 	
+//	@GetMapping
+//	public ResponseEntity<ApiResponse<List<MovieCardDto>>> getAllMovies(HttpSession httpSession) {
+//		Integer userId = null;
+//		if (httpSession.getAttribute("userCert") != null) {
+//			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
+//		}
+//		List<MovieCardDto> movies = movieService.findAll(userId);
+//		return ResponseEntity.ok(ApiResponse.success(movies));
+//	}
+	
 	@PostMapping
-	public ResponseEntity<ApiResponse<List<MovieCardDto>>> getFilteredMovie(
+	public ResponseEntity<ApiResponse<List<MovieCardDto>>> findMoviesByFilter(
 			@ModelAttribute MoviesFilterDto moviesFilterDto, HttpSession httpSession) {
 		Integer userId = null;
 		if (httpSession.getAttribute("userCert") != null) {
 			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
 		}
-		List<MovieCardDto> movies = movieService.getFilteredMovies(moviesFilterDto, userId);			
+		List<MovieCardDto> movies = movieService.findMoviesByFilter(moviesFilterDto, userId);			
 		return ResponseEntity.ok(ApiResponse.success(movies));
 	}
+	
+//	@PostMapping
+//	public ResponseEntity<ApiResponse<List<MovieCardDto>>> getFilteredMovie(
+//			@ModelAttribute MoviesFilterDto moviesFilterDto, HttpSession httpSession) {
+//		Integer userId = null;
+//		if (httpSession.getAttribute("userCert") != null) {
+//			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
+//		}
+//		List<MovieCardDto> movies = movieService.getFilteredMovies(moviesFilterDto, userId);			
+//		return ResponseEntity.ok(ApiResponse.success(movies));
+//	}
 
 	@GetMapping("/{id}")
 	public ResponseEntity<ApiResponse<MovieDto>> getSpecificMovie(
@@ -60,18 +100,18 @@ public class MovieController {
 		return ResponseEntity.ok(ApiResponse.success(movie));
 	}
 
-	@GetMapping("/search")
-	public ResponseEntity<ApiResponse<List<MovieCardDto>>> searchMovie(
-			@RequestParam String keyword, HttpSession httpSession) {
-		Integer userId = null;
-		if (httpSession.getAttribute("userCert") != null) {
-			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
-		}
-		List<MovieCardDto> movies = movieService.findByTitle("%"+keyword+"%", userId);
-		movies.stream().sorted((m1,m2) -> m1.getReviewCount() - m2.getReviewCount());
-		return ResponseEntity.ok(ApiResponse.success(movies));
-	}
+//	@GetMapping("/search")
+//	public ResponseEntity<ApiResponse<List<MovieCardDto>>> searchMovie(
+//			@RequestParam String keyword, HttpSession httpSession) {
+//		Integer userId = null;
+//		if (httpSession.getAttribute("userCert") != null) {
+//			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
+//		}
+//		List<MovieCardDto> movies = movieService.findByTitle("%"+keyword+"%", userId);
+//		return ResponseEntity.ok(ApiResponse.success(movies));
+//	}
 	
+
 	@PostMapping("/add")
 	public ResponseEntity<ApiResponse<Void>> addMovie(
 			@RequestBody MovieDto movieDto){
@@ -85,4 +125,5 @@ public class MovieController {
 		movieService.addAll(movieDtos);
 		return ResponseEntity.ok(ApiResponse.success("新增成功"));
 	}
+	
 }

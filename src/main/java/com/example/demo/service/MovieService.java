@@ -2,6 +2,9 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import com.example.demo.model.dto.MovieDto;
 import com.example.demo.model.dto.MoviesFilterDto;
 import com.example.demo.model.entity.Movie;
@@ -9,17 +12,18 @@ import com.example.demo.model.dto.MovieCardDto;
 
 public interface MovieService {
 	List<MovieCardDto> findAll(Integer userId);
-	List<MovieCardDto> findByTitle(String title,Integer userId);
 	List<MovieCardDto> getFilteredMovies(MoviesFilterDto moviesFilterDto, Integer userId);
 	List<MovieCardDto> findByType(String type, Integer userId);
 	List<MovieCardDto> findByFilter(MoviesFilterDto moviesFilterDto, Integer userId);
 	List<MovieCardDto> findWatchlist(Integer userId);
 	List<MovieCardDto> findWatchlistByFilter(MoviesFilterDto moviesFilterDto, Integer userId);
+	List<MovieCardDto> findMoviesByFilter(MoviesFilterDto filter, Integer userId);
 
+	Page<MovieCardDto> getMovieCardDtosPage(Integer userId, Pageable pageable, String typeFilter);
 	MovieDto findById(Integer movieId, Integer userId);
 	void add(MovieDto movieDto);
 	void addAll(List<MovieDto> movieDtos);
-	Integer calculateReviewCount(Movie movie);
+	Long calculateReviewCount(Movie movie);
 	Double calculateScoreAvg(Movie movie);
 	List<MovieCardDto> toCardDtoList(List<Movie> movies, Integer userId);
 	List<MovieDto> toDtoList(List<Movie> movies, Integer userId);

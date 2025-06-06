@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -81,7 +82,7 @@ public class Movie {
 		if (this==o) return true;
 		if (!(o instanceof Movie)) return false;
 		Movie other = (Movie) o;
-		return movieId != null && movieId.equals(other.getMovieId());
+		return Objects.equals(movieId,other.getMovieId());
 	}
 	
 }

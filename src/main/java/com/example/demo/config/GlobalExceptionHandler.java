@@ -7,6 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.example.demo.exception.ParamsInvalidException;
 import com.example.demo.exception.movieException.MovieException;
 import com.example.demo.exception.reivewException.ReviewException;
 import com.example.demo.exception.userException.UserException;
@@ -33,6 +34,11 @@ public class GlobalExceptionHandler {
 	
 	@ExceptionHandler(ReviewException.class)
 	public ResponseEntity<ApiResponse<Void>> handleReviewException(ReviewException e){
+		return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST, e.getMessage()));
+	}
+	
+	@ExceptionHandler(ParamsInvalidException.class)
+	public ResponseEntity<ApiResponse<Void>> handleParamsInvalidException(ParamsInvalidException e){
 		return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST, e.getMessage()));
 	}
 	
