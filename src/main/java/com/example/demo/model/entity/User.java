@@ -75,4 +75,7 @@ public class User {
 	
 	@Column
 	private String emailVerfToken;
+
+	@Column
+	private String passwordToken;
 }

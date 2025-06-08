@@ -19,9 +19,6 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRep
 	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.movieId IN :moviesId")
 	List<Movie> findAllWithReviewsByIds(List<Integer> moviesId);
 	
-	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.title LIKE :keyword")
-	List<Movie> findByTitle(String keyword);
-	
 	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.type = :type")
 	List<Movie> findByType(String type);
 	
@@ -44,8 +41,8 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRep
 				m.director,
 				m.actor,
 				m.rating,
-				(SELECT AVG(r.score) FROM Review r WHERE r.movie = m),
-				(SELECT COUNT(r) FROM Review r WHERE r.movie = m),
+				(SELECT AVG(r.score) FROM Review r WHERE r.movie = m) AS scoreAvg,
+				(SELECT COUNT(r) FROM Review r WHERE r.movie = m) AS reviewCount,
 				CASE WHEN :userId IS NOT NULL THEN
 					(SELECT CASE WHEN COUNT(u) > 0 THEN true ELSE false END
 			 		 FROM User u JOIN u.watchlist w WHERE w=m AND u.userId = :userId)

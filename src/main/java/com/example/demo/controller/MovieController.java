@@ -2,11 +2,12 @@ package com.example.demo.controller;
 
 import java.util.List;
 
-import org.hibernate.internal.build.AllowSysOut;
+import com.example.demo.exception.ParamsInvalidException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,33 +31,55 @@ import jakarta.servlet.http.HttpSession;
 @RestController
 @RequestMapping("/tiann/movie")
 public class MovieController {
-	@Autowired
-	private MovieService movieService;
+  @Autowired
+  private MovieService movieService;
 
-	@GetMapping
-	public ResponseEntity<ApiResponse<Page<MovieCardDto>>> getAllMovieCardDto (
-			HttpSession httpSession,
-			@RequestParam(defaultValue = "1") String page,
-			@RequestParam(defaultValue = "all") String type){
-		//使用者資訊
-		Integer userId = null;
-		if (httpSession.getAttribute("userCert") != null) {
-			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
-		}
-		
-		// 頁數
-		Integer pageInteger = 1;
-		try {
-			pageInteger = Integer.parseInt(page);
-		}catch(NumberFormatException e) {
-			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"參數錯誤"));
-		}
-		Pageable pageable = PageRequest.of(pageInteger - 1, 10);
-		
-		Page<MovieCardDto> dtos = movieService.getMovieCardDtosPage(userId, pageable, type);
-		return ResponseEntity.ok(ApiResponse.success(dtos));
-	}
-	
+  // 取得單一電影
+  @GetMapping("/{id}")
+  public ResponseEntity<ApiResponse<MovieDto>> getSpecificMovie(
+      @PathVariable Integer id, HttpSession httpSession) {
+    Integer userId = null;
+    if (httpSession.getAttribute("userCert") != null) {
+      userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
+    }
+    MovieDto movie = movieService.findById(id, userId);
+    return ResponseEntity.ok(ApiResponse.success(movie));
+  }
+
+  // 取得所有電影
+  @GetMapping
+  public ResponseEntity<ApiResponse<Page<MovieCardDto>>> getAllMovieCardDto(
+      HttpSession httpSession,
+      @RequestParam(defaultValue = "1") String page,
+      @RequestParam(defaultValue = "score_desc") String sort,
+      @RequestParam(defaultValue = "all") String type,
+      @RequestParam String keyword) {
+    //使用者資訊
+    Integer userId = null;
+    if (httpSession.getAttribute("userCert") != null) {
+      userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
+    }
+    // 頁數
+    int pageInteger = 1;
+    try {
+      pageInteger = Integer.parseInt(page);
+    } catch (NumberFormatException e) {
+      throw new ParamsInvalidException();
+    }
+    // 排序
+    Sort sortOption = switch (sort) {
+      case "score_desc" -> Sort.by(Sort.Direction.DESC, "scoreAvg");
+      case "score_asc" -> Sort.by(Sort.Direction.ASC, "scoreAvg");
+      case "reviewCount_desc" -> Sort.by(Sort.Direction.DESC, "reviewCount");
+      case "releaseDate_desc" -> Sort.by(Sort.Direction.DESC, "releaseDate");
+      default -> throw new ParamsInvalidException();
+    };
+    // 分頁查詢
+    Pageable pageable = PageRequest.of(pageInteger - 1, 10, sortOption);
+    Page<MovieCardDto> dtos = movieService.getMovieCardDtosPage(userId, pageable, type);
+    return ResponseEntity.ok(ApiResponse.success(dtos));
+  }
+
 //	@GetMapping
 //	public ResponseEntity<ApiResponse<List<MovieCardDto>>> getAllMovies(HttpSession httpSession) {
 //		Integer userId = null;
@@ -66,18 +89,19 @@ public class MovieController {
 //		List<MovieCardDto> movies = movieService.findAll(userId);
 //		return ResponseEntity.ok(ApiResponse.success(movies));
 //	}
-	
-	@PostMapping
-	public ResponseEntity<ApiResponse<List<MovieCardDto>>> findMoviesByFilter(
-			@ModelAttribute MoviesFilterDto moviesFilterDto, HttpSession httpSession) {
-		Integer userId = null;
-		if (httpSession.getAttribute("userCert") != null) {
-			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
-		}
-		List<MovieCardDto> movies = movieService.findMoviesByFilter(moviesFilterDto, userId);			
-		return ResponseEntity.ok(ApiResponse.success(movies));
-	}
-	
+
+
+//	@PostMapping
+//	public ResponseEntity<ApiResponse<List<MovieCardDto>>> findMoviesByFilter(
+//			@ModelAttribute MoviesFilterDto moviesFilterDto, HttpSession httpSession) {
+//		Integer userId = null;
+//		if (httpSession.getAttribute("userCert") != null) {
+//			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
+//		}
+//		List<MovieCardDto> movies = movieService.findMoviesByFilter(moviesFilterDto, userId);
+//		return ResponseEntity.ok(ApiResponse.success(movies));
+//	}
+
 //	@PostMapping
 //	public ResponseEntity<ApiResponse<List<MovieCardDto>>> getFilteredMovie(
 //			@ModelAttribute MoviesFilterDto moviesFilterDto, HttpSession httpSession) {
@@ -89,17 +113,6 @@ public class MovieController {
 //		return ResponseEntity.ok(ApiResponse.success(movies));
 //	}
 
-	@GetMapping("/{id}")
-	public ResponseEntity<ApiResponse<MovieDto>> getSpecificMovie(
-			@PathVariable Integer id, HttpSession httpSession) {
-		Integer userId = null;
-		if (httpSession.getAttribute("userCert") != null) {
-			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
-		}
-		MovieDto movie = movieService.findById(id, userId);
-		return ResponseEntity.ok(ApiResponse.success(movie));
-	}
-
 //	@GetMapping("/search")
 //	public ResponseEntity<ApiResponse<List<MovieCardDto>>> searchMovie(
 //			@RequestParam String keyword, HttpSession httpSession) {
@@ -110,20 +123,21 @@ public class MovieController {
 //		List<MovieCardDto> movies = movieService.findByTitle("%"+keyword+"%", userId);
 //		return ResponseEntity.ok(ApiResponse.success(movies));
 //	}
-	
 
-	@PostMapping("/add")
-	public ResponseEntity<ApiResponse<Void>> addMovie(
-			@RequestBody MovieDto movieDto){
-		movieService.add(movieDto);
-		return ResponseEntity.ok(ApiResponse.success("新增成功"));
-	}
-	
-	@PostMapping("/addAll")
-	public ResponseEntity<ApiResponse<Void>> addAllMovie(
-			@RequestBody List<MovieDto> movieDtos){
-		movieService.addAll(movieDtos);
-		return ResponseEntity.ok(ApiResponse.success("新增成功"));
-	}
-	
+  // 新增電影
+  @PostMapping("/add")
+  public ResponseEntity<ApiResponse<Void>> addMovie(
+      @RequestBody MovieDto movieDto) {
+    movieService.add(movieDto);
+    return ResponseEntity.ok(ApiResponse.success("新增成功"));
+  }
+
+  // 新增多部電影
+  @PostMapping("/addAll")
+  public ResponseEntity<ApiResponse<Void>> addAllMovie(
+      @RequestBody List<MovieDto> movieDtos) {
+    movieService.addAll(movieDtos);
+    return ResponseEntity.ok(ApiResponse.success("新增成功"));
+  }
+
 }

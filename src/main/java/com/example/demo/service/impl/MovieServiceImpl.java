@@ -52,17 +52,15 @@ public class MovieServiceImpl implements MovieService {
 
 	@Override
 	public MovieDto findById(Integer movieId, Integer userId) {
-		Optional<Movie> optMovie = movieRepository.findByIdWithReviews(movieId);
-		if (optMovie.isEmpty()) {
-			throw new MovieNotFoundException("查無電影");
-		}
-		Movie movie = optMovie.get();
+		Movie movie = movieRepository.findByIdWithReviews(movieId)
+				.orElseThrow(()->new MovieNotFoundException("查無此電影"));
 		MovieDto movieDto = toDto(movie, userId);
 		List<ReviewDto> reviewDtos = reviewService.toDtoList(movie.getReviews(), userId);
 		movieDto.setReviews(reviewDtos);
 		return movieDto;
 	}
 
+	// abandoned
 	@Override
 	public List<MovieCardDto> findMoviesByFilter(MoviesFilterDto filter, Integer userId) {
 		List<Movie> movies = movieRepository.findMoviesByFilter(filter, userId);
@@ -73,6 +71,7 @@ public class MovieServiceImpl implements MovieService {
 		return sortMovies(dtos, filter.getSort());
 	}
 
+	// abandoned
 	List<MovieCardDto> sortMovies(List<MovieCardDto> movies, String sort) {
 		switch (sort) {
 		case "最新上映":

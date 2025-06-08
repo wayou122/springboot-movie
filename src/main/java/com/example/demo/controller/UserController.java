@@ -42,35 +42,31 @@ public class UserController {
 		UserDto userDto = userService.getUserById(userCert.getUserId()); 
 		return ResponseEntity.ok(ApiResponse.success("使用者資訊",userDto));
 	}
-	
+
+	//修改帳戶名稱
 	@PutMapping("/update-username")
 	public ResponseEntity<ApiResponse<UserDto>> updateUsername(
 			@ModelAttribute @Valid UserUpdateDto userUpdateDto,
-			HttpSession httpSession,
-			BindingResult bindingResult){
+			HttpSession httpSession){
 		if (httpSession.getAttribute("userCert") == null) {
 			return ResponseEntity.badRequest()
 					.body(ApiResponse.error(HttpStatus.BAD_REQUEST,"尚未登入"));
 		}
 		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
-		String username = userService.getUserById(userCert.getUserId()).getUsername();
-		if (userUpdateDto.getUsername() != null) {
-			String newUsername = userUpdateDto.getUsername();
-			if (!userService.existsByUsername(newUsername)) {
-				userService.updateUsername(userCert.getUserId(),newUsername);				
-			}else if (newUsername.equals(username)) {
-				
-			}else if(userService.existsByUsername(userUpdateDto.getUsername())) {
-				return ResponseEntity.badRequest()
-						.body(ApiResponse.error(HttpStatus.BAD_REQUEST,"帳號名稱重複"));
-			}
+		Integer userId = userCert.getUserId();
+		if (userUpdateDto.getUsername()==null){
+			return ResponseEntity.badRequest()
+					.body(ApiResponse.error(HttpStatus.BAD_REQUEST,"請輸入修改資訊"));
 		}
+		String newUsername = userUpdateDto.getUsername();
+		userService.updateUsername(userId, newUsername);
 		return ResponseEntity.ok(ApiResponse.success("修改成功",null));
 	}
-	
-	@PostMapping("/watchlist")
-	public ResponseEntity<ApiResponse<List<MovieCardDto>>> aaa(
-			@ModelAttribute MoviesFilterDto moviesFilterDto, HttpSession httpSession){
+
+	//收藏電影清單
+	@GetMapping("/watchlist")
+	public ResponseEntity<ApiResponse<List<MovieCardDto>>> getWatchlist(
+			HttpSession httpSession){
 		if (httpSession.getAttribute("userCert") == null) {
 			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"尚未登入"));
 		}
@@ -79,7 +75,8 @@ public class UserController {
 		List<MovieCardDto> dtos = userService.getWatchlist(userId);
 		return ResponseEntity.ok(ApiResponse.success("查詢成功",dtos));
 	}
-	
+
+	// 切換收藏電影
 	@PutMapping("/toggle-watchlist/movie/{movieId}")
 	public ResponseEntity<ApiResponse<Boolean>> toggleMovieForWatchlist(
 			 @PathVariable Integer movieId, HttpSession httpSession){

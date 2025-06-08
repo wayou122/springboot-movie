@@ -16,7 +16,8 @@ import jakarta.servlet.http.HttpSession;
 public class AuthcodeController {
 	@Autowired
 	AuthcodeService authcodeService;
-	
+
+	// 驗證碼
 	@GetMapping("/authcode")
 	public byte[] getAuthcode(HttpSession httpSession) throws IOException {
 		String authcode = authcodeService.generateAuthcode();

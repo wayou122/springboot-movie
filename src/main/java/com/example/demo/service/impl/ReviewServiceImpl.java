@@ -44,7 +44,8 @@ public class ReviewServiceImpl implements ReviewService {
 	private ReviewReactionRepository reviewReactionRepository;
 	@Autowired
 	private ReviewMapper reviewMapper;
-	
+
+	//新增評論
 	@Override
 	public void addReview(ReviewDto reviewDto, Integer userId, Integer movieId) {
 		User user = userRepository.findById(userId)
@@ -60,6 +61,7 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewRepository.save(review);
 	}
 
+	//刪除評論
 	@Override
 	public void deleteReview(Integer reviewId, Integer userId) {
 		Review review = reviewRepository.findById(reviewId)
@@ -70,10 +72,11 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewRepository.deleteById(reviewId);
 	}
 
+	//更新評論
 	@Override
 	public void updateReview(ReviewDto reviewDto,Integer reviewId, Integer userId) {
 		Review review = reviewRepository.findById(reviewId)
-				.orElseThrow(()-> new ReviewNotFoundException());
+				.orElseThrow(ReviewNotFoundException::new);
 		if(review.getUser().getUserId() != userId) {
 			throw new AccessInvalidException("沒有修改權限");
 		}
@@ -83,6 +86,7 @@ public class ReviewServiceImpl implements ReviewService {
 		reviewRepository.save(review);
 	}
 
+	//按讚評論
 	@Override
 	public void toggleReaction(Integer userId, Integer reviewId, Integer reaction) {
 		if (!userRepository.existsById(userId)) {
@@ -110,7 +114,8 @@ public class ReviewServiceImpl implements ReviewService {
 			}
 		}
 	}
-	
+
+	//取得所有電影評論
 	@Override
 	public Page<ReviewMovieCardDto> getReviewMovieCardDtosPage(
 			Integer userId, Pageable pageable, Integer scoreFilter) {
@@ -140,6 +145,4 @@ public class ReviewServiceImpl implements ReviewService {
 		return reviewReactionRepository.countLike(review.getReviewId());
 	}
 
-	
-	
 }

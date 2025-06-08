@@ -5,6 +5,9 @@ import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.demo.exception.userException.PasswordTokenWrongException;
+import com.example.demo.exception.userException.UserException;
+import com.example.demo.model.dto.UserLoginDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -77,46 +80,83 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Boolean emailConfirm(String username, String token) {
-		User user = userRepository.findByUsername(username)
+	public Boolean emailConfirm(String email, String token) {
+		User user = userRepository.findByEmail(email)
 				.orElseThrow(()-> new UserNotFoundException("帳號尚未註冊"));
 		if (user.getEmailVerfToken().equals(token)) {
-			user.setEmailVerf(true);			
+			user.setEmailVerf(true);
+			user.setEmailVerfToken(null);
 			userRepository.save(user);
 			return true;
 		}
 		return false;
 	}
-	
+
+	@Override
+	public Boolean checkEmailConfirm(String email) {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(()->new UserNotFoundException("帳號尚未註冊"));
+		return user.getEmailVerf();
+	}
+
 	@Override
 	public Boolean existsByUsername(String username){
 		return userRepository.existsByUsername(username);
 	}
 
 	@Override
-	public void updateUsername(Integer userId, String username) {
-		if (existsByUsername(username)) {
-			throw new UserExistedException("使用者名稱已被使用");
+	public Boolean existsByEmail(String email) {
+		return userRepository.existsByEmail(email);
+	}
+
+	@Override
+	public String setPasswordToken(String email) {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(UserNotFoundException::new);
+		SecureRandom random = new SecureRandom();
+		String token = new BigInteger(130, random).toString(32);
+		user.setPasswordToken(token);
+		userRepository.save(user);
+		return token;
+	}
+
+	@Override
+	public void resetPassword(String email, String token, String newPassword) {
+		User user = userRepository.findByEmail(email)
+				.orElseThrow(UserNotFoundException::new);
+		if(!token.equals(user.getPasswordToken())){
+			throw new PasswordTokenWrongException("重設密碼連結錯誤");
 		}
-		User user = userRepository.findById(userId).get();
-		user.setUsername(username);		
+		String salt = Hash.getSalt();
+		String passwordHash = Hash.getHash(newPassword, salt);
+		user.setPasswordHash(passwordHash);
+		user.setSalt(salt);
+		user.setPasswordToken(null);
+		userRepository.save(user);
+	}
+
+	@Override
+	public void updateUsername(Integer userId, String newUsername) {
+		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+		String oldUsername = user.getUsername();
+		if (oldUsername.equals(newUsername)){
+			throw new UserException("新名稱與舊名稱相同");
+		}
+		if (existsByUsername(newUsername)) {
+			throw new UserExistedException("帳號名稱已被使用");
+		}
+		user.setUsername(newUsername);
 		userRepository.save(user);
 	}
 	
 	@Override
 	public void updateUserPassword(Integer userId, String password) {
-		User user = userRepository.findById(userId).get();
+		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 		String salt = Hash.getSalt();
 		String passwordHash = Hash.getHash(password, salt);
 		user.setPasswordHash(passwordHash);
 		user.setSalt(salt);
 		userRepository.save(user);
-	}
-	
-	@Override
-	public void updateUserNameAndPassword(Integer userId, String username, String password) {
-		updateUsername(userId, username);
-		updateUsername(userId, password);
 	}
 
 	@Override
@@ -126,8 +166,8 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Boolean toggleMovieForWatchlist(Integer userId, Integer movieId) {
-		User user = userRepository.findByIdWithWatchlist(userId).orElseThrow(()->new UserNotFoundException());
-		Movie movie = movieRepository.findById(movieId).orElseThrow(()->new MovieNotFoundException());
+		User user = userRepository.findByIdWithWatchlist(userId).orElseThrow(UserNotFoundException::new);
+		Movie movie = movieRepository.findById(movieId).orElseThrow(MovieNotFoundException::new);
 		if (user.getWatchlist().contains(movie)) {
 			user.getWatchlist().remove(movie);
 			userRepository.save(user);
@@ -143,9 +183,7 @@ public class UserServiceImpl implements UserService {
 	public List<MovieCardDto> getWatchlist(Integer userId) {
 		List<Integer> movieIds = userRepository.findWatchlistMovieIds(userId);
 		List<Movie> movies = movieRepository.findAllWithReviewsByIds(movieIds);
-		List<MovieCardDto> dtos = movieService.toCardDtoList(movies, userId);
-		return dtos;
+    return movieService.toCardDtoList(movies, userId);
 	}
-	
 	
 }
