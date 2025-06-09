@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,9 @@ import com.example.demo.service.UserService;
 
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.mail.Multipart;
 
 @RestController
 @RequestMapping("/tiann/user")
@@ -54,13 +58,30 @@ public class UserController {
 		}
 		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
 		Integer userId = userCert.getUserId();
-		if (userUpdateDto.getUsername()==null){
-			return ResponseEntity.badRequest()
-					.body(ApiResponse.error(HttpStatus.BAD_REQUEST,"請輸入修改資訊"));
-		}
 		String newUsername = userUpdateDto.getUsername();
 		userService.updateUsername(userId, newUsername);
 		return ResponseEntity.ok(ApiResponse.success("修改成功",null));
+	}
+
+	//修改帳號名稱和圖片
+	@PostMapping("/update-account")
+	public ResponseEntity<ApiResponse<UserDto>> updateAccount(
+			@RequestParam("username") String newUsername,
+			@RequestParam("image") MultipartFile image,
+			HttpSession httpSession){
+		if (httpSession.getAttribute("userCert") == null) {
+			return ResponseEntity.badRequest()
+					.body(ApiResponse.error(HttpStatus.BAD_REQUEST,"尚未登入"));
+		}
+		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
+		Integer userId = userCert.getUserId();
+		userService.updateUsername(userId, newUsername);
+    try {
+      userService.updateImage(userId, image);
+    } catch (IOException e) {
+			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR,"圖片上傳失敗"));
+    }
+    return ResponseEntity.ok(ApiResponse.success("修改成功",null));
 	}
 
 	//收藏電影清單

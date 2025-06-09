@@ -11,6 +11,7 @@ public class ReviewDto {
 	private Integer reviewId;
 	private String authorName;
 	private Integer authorId;
+	private String authorImagePath;
 	private String content;
 	private Integer score;
 	private Integer likeCount;

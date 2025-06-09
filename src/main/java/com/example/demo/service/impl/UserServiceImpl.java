@@ -1,9 +1,14 @@
 package com.example.demo.service.impl;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.example.demo.exception.userException.PasswordTokenWrongException;
 import com.example.demo.exception.userException.UserException;
@@ -25,6 +30,9 @@ import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MovieService;
 import com.example.demo.service.UserService;
 import com.example.demo.util.Hash;
+import org.springframework.web.multipart.MultipartFile;
+
+import javax.mail.Multipart;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -37,6 +45,8 @@ public class UserServiceImpl implements UserService {
 	MovieService movieService;
 	@Autowired
 	UserMapper userMapper;
+
+	private final String uploadDir = "uploads/account/";
 
 	@Override
 	public UserDto getUserById(Integer userId) {
@@ -142,15 +152,28 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void updateUsername(Integer userId, String newUsername) {
+		if (newUsername.isBlank()) return;
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 		String oldUsername = user.getUsername();
 		if (oldUsername.equals(newUsername)){
-			throw new UserException("新名稱與舊名稱相同");
+			return;
 		}
 		if (existsByUsername(newUsername)) {
 			throw new UserExistedException("帳號名稱已被使用");
 		}
 		user.setUsername(newUsername);
+		userRepository.save(user);
+	}
+
+	@Override
+	public void updateImage(Integer userId, MultipartFile image) throws IOException {
+		if (image == null) return;
+		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+		String filename = userId + "_" + image.getOriginalFilename();
+		Path filepath = Paths.get(uploadDir, filename);
+		Files.createDirectories(filepath.getParent());
+		Files.write(filepath, image.getBytes());
+		user.setImagePath(filepath.toString());
 		userRepository.save(user);
 	}
 	

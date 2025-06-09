@@ -9,4 +9,5 @@ public class UserDto {
 	private String email;
 	private Boolean emailVerf;
 	private String role;
+	private String imagePath;
 }

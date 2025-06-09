@@ -17,6 +17,7 @@ public class ReviewMovieCardDto {
 	private Integer score;
 	private String content;
 	private String authorName;
+	private String authorImagePath;
 	private Integer likeCount;
 	private Integer reaction;
 	private Integer movieId;
@@ -25,8 +26,8 @@ public class ReviewMovieCardDto {
 	
 	public ReviewMovieCardDto(
 	    Integer reviewId, Integer authorId, LocalDateTime createdDate,
-	    Integer score, String content, String authorName, Long likeCount,
-	    Integer reaction, Integer movieId, String title, String posterUrl
+	    Integer score, String content, String authorName, String authorImagePath,
+			Long likeCount, Integer reaction, Integer movieId, String title, String posterUrl
 	) {
 	    this.reviewId = reviewId;
 	    this.authorId = authorId;
@@ -34,6 +35,7 @@ public class ReviewMovieCardDto {
 	    this.score = score;
 	    this.content = content;
 	    this.authorName = authorName;
+			this.authorImagePath = authorImagePath;
 	    this.likeCount = likeCount != null ? likeCount.intValue() : 0;
 	    this.reaction = reaction;
 	    this.movieId = movieId;
