@@ -52,8 +52,9 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRep
 			LEFT JOIN m.reviews r
 			LEFT JOIN m.watchlistUsers u
 			WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
+			AND (:keywordFilter IS NULL OR m.title LIKE :keywordFilter)
 			""")
 	Page<MovieCardDto> findAllMovieCard(
-			Integer userId, Pageable pageable, List<String> typeFilter);
+			Integer userId, Pageable pageable, List<String> typeFilter, String keywordFilter);
 	
 }

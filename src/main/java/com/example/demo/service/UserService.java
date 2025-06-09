@@ -11,7 +11,7 @@ public interface UserService {
 	UserDto getUserById(Integer userId);
 	String addUser(UserRegisterDto userRegisterDto);
 	String addUser(String username, String email, String password);
-	Boolean emailConfirm(String email, String token);
+	void emailConfirm(String email, String token);
 	Boolean checkEmailConfirm(String email);
 	Boolean existsByUsername(String username);
 	Boolean existsByEmail(String email);

@@ -1,11 +1,10 @@
 package com.example.demo.service.impl;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -223,7 +222,8 @@ public class MovieServiceImpl implements MovieService {
 	}
 
 	@Override
-	public Page<MovieCardDto> getMovieCardDtosPage(Integer userId, Pageable pageable, String typeFilter) {
+  public Page<MovieCardDto> getMovieCardDtosPage(
+      Integer userId, Pageable pageable, String typeFilter, String keyword) {
 		if (userId != null && !userRepository.existsById(userId)) {
 			throw new UserNotFoundException();
 		}
@@ -237,6 +237,10 @@ public class MovieServiceImpl implements MovieService {
 		}else {
 			typeFilterList = List.of(typeMap.get(typeFilter));
 		}
-		return movieRepository.findAllMovieCard(userId, pageable, typeFilterList);
+    String keywordFilter = null;
+    if (keyword != null && !keyword.isBlank()){
+      keywordFilter = "%"+keyword+"%";
+    }
+		return movieRepository.findAllMovieCard(userId, pageable, typeFilterList, keywordFilter);
 	}
 }

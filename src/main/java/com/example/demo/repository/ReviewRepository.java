@@ -23,7 +23,7 @@ public interface ReviewRepository extends JpaRepository<Review, Integer> {
 				r.score,
 				r.content,
 				r.user.username,
-				(SELECT COUNT(rr) FROM ReviewReaction rr WHERE rr.review = r AND rr.reaction = 1),
+				(SELECT COUNT(rr) FROM ReviewReaction rr WHERE rr.review = r AND rr.reaction = 1) AS likeCount,
 				CASE WHEN :userId IS NOT NULL THEN (SELECT rr.reaction FROM ReviewReaction rr WHERE rr.review = r AND rr.user.userId = :userId) ELSE 0 END,
 				r.movie.movieId,
 				r.movie.title,

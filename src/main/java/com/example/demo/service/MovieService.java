@@ -19,7 +19,6 @@ public interface MovieService {
 	List<MovieCardDto> findWatchlistByFilter(MoviesFilterDto moviesFilterDto, Integer userId);
 	List<MovieCardDto> findMoviesByFilter(MoviesFilterDto filter, Integer userId);
 
-	Page<MovieCardDto> getMovieCardDtosPage(Integer userId, Pageable pageable, String typeFilter);
 	MovieDto findById(Integer movieId, Integer userId);
 	void add(MovieDto movieDto);
 	void addAll(List<MovieDto> movieDtos);
@@ -29,6 +28,6 @@ public interface MovieService {
 	List<MovieDto> toDtoList(List<Movie> movies, Integer userId);
 	MovieDto toDto(Movie movie, Integer usrId);
 	MovieCardDto toCardDto(Movie movie, Integer usrId);
-	
-
+	Page<MovieCardDto> getMovieCardDtosPage(
+			Integer userId, Pageable pageable, String typeFilter, String keyword);
 }

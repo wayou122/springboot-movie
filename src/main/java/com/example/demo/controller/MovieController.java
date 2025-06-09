@@ -53,7 +53,7 @@ public class MovieController {
       @RequestParam(defaultValue = "1") String page,
       @RequestParam(defaultValue = "score_desc") String sort,
       @RequestParam(defaultValue = "all") String type,
-      @RequestParam String keyword) {
+      @RequestParam(defaultValue = "") String keyword) {
     //使用者資訊
     Integer userId = null;
     if (httpSession.getAttribute("userCert") != null) {
@@ -76,7 +76,7 @@ public class MovieController {
     };
     // 分頁查詢
     Pageable pageable = PageRequest.of(pageInteger - 1, 10, sortOption);
-    Page<MovieCardDto> dtos = movieService.getMovieCardDtosPage(userId, pageable, type);
+    Page<MovieCardDto> dtos = movieService.getMovieCardDtosPage(userId, pageable, type,keyword);
     return ResponseEntity.ok(ApiResponse.success(dtos));
   }
 

@@ -65,10 +65,8 @@ public class RegisterController {
 	@GetMapping("/email-confirm")
 	public ResponseEntity<ApiResponse<String>> emailConfirm(
 			@RequestParam String email, @RequestParam String token) {
-		if(userService.emailConfirm(email,token)) {
-			return ResponseEntity.ok(ApiResponse.success("信箱驗證成功"));
-		}
-		return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"信箱驗證錯誤"));
+		userService.emailConfirm(email,token);
+		return ResponseEntity.ok(ApiResponse.success("信箱驗證成功"));
 	}
 	
 }

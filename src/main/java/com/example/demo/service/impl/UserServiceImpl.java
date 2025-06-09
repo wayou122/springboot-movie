@@ -80,16 +80,21 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Boolean emailConfirm(String email, String token) {
+	public void emailConfirm(String email, String token) {
 		User user = userRepository.findByEmail(email)
-				.orElseThrow(()-> new UserNotFoundException("帳號尚未註冊"));
-		if (user.getEmailVerfToken().equals(token)) {
-			user.setEmailVerf(true);
-			user.setEmailVerfToken(null);
-			userRepository.save(user);
-			return true;
+				.orElseThrow(() -> new UserNotFoundException("帳號尚未註冊"));
+		if (user.getEmailVerf()) {
+			throw new UserException("信箱已完成驗證");
 		}
-		return false;
+		if (user.getEmailVerfToken() == null) {
+			throw new UserException("驗證碼已失效，請聯繫客服");
+		}
+		if (!user.getEmailVerfToken().equals(token)) {
+			throw new UserException("驗證失敗，請確認網址");
+		}
+		user.setEmailVerf(true);
+		user.setEmailVerfToken(null);
+		userRepository.save(user);
 	}
 
 	@Override
