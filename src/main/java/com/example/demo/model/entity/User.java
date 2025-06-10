@@ -54,7 +54,7 @@ public class User {
 	private String role = "user";
 
 	@Column
-	private String imagePath = "0_defaultimg.jpg";
+	private String imagePath = "uploads/account/0_defaultImg.jpg";
 	
 	@OneToMany(mappedBy = "user")
 	private List<Review> reviews;

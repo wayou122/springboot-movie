@@ -1,5 +1,6 @@
 package com.example.demo.service.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
@@ -89,6 +90,7 @@ public class UserServiceImpl implements UserService {
 		return token;
 	}
 
+	//驗證email
 	@Override
 	public void emailConfirm(String email, String token) {
 		User user = userRepository.findByEmail(email)
@@ -107,6 +109,7 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 	}
 
+	//確認email驗證狀態
 	@Override
 	public Boolean checkEmailConfirm(String email) {
 		User user = userRepository.findByEmail(email)
@@ -124,6 +127,7 @@ public class UserServiceImpl implements UserService {
 		return userRepository.existsByEmail(email);
 	}
 
+	//建立重設密碼token
 	@Override
 	public String setPasswordToken(String email) {
 		User user = userRepository.findByEmail(email)
@@ -135,6 +139,7 @@ public class UserServiceImpl implements UserService {
 		return token;
 	}
 
+	//重設密碼
 	@Override
 	public void resetPassword(String email, String token, String newPassword) {
 		User user = userRepository.findByEmail(email)
@@ -150,6 +155,7 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 	}
 
+	//修改帳號名稱
 	@Override
 	public void updateUsername(Integer userId, String newUsername) {
 		if (newUsername.isBlank()) return;
@@ -165,14 +171,30 @@ public class UserServiceImpl implements UserService {
 		userRepository.save(user);
 	}
 
+	//修改帳號圖片
 	@Override
 	public void updateImage(Integer userId, MultipartFile image) throws IOException {
 		if (image == null) return;
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
+		//建立新圖片
 		String filename = userId + "_" + image.getOriginalFilename();
 		Path filepath = Paths.get(uploadDir, filename);
-		Files.createDirectories(filepath.getParent());
-		Files.write(filepath, image.getBytes());
+		try{
+			Files.createDirectories(filepath.getParent());
+			Files.write(filepath, image.getBytes());
+		} catch(IOException e){
+			throw new RuntimeException("圖片新增失敗");
+		}
+		//刪除舊圖片
+		String oldImagePath = user.getImagePath();
+		if (oldImagePath != null && !oldImagePath.equals("uploads/account/0_defaultImg.jpg")){
+			File oldFile = new File(oldImagePath);
+			if (oldFile.exists()) {
+				if(!oldFile.delete()){
+					System.out.println("圖片刪除失敗");
+				}
+			}
+		}
 		user.setImagePath(filepath.toString());
 		userRepository.save(user);
 	}
@@ -192,6 +214,7 @@ public class UserServiceImpl implements UserService {
 		userRepository.deleteById(userId);
 	}
 
+	//收藏電影
 	@Override
 	public Boolean toggleMovieForWatchlist(Integer userId, Integer movieId) {
 		User user = userRepository.findByIdWithWatchlist(userId).orElseThrow(UserNotFoundException::new);
@@ -207,6 +230,7 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	//收藏電影清單
 	@Override
 	public List<MovieCardDto> getWatchlist(Integer userId) {
 		List<Integer> movieIds = userRepository.findWatchlistMovieIds(userId);
