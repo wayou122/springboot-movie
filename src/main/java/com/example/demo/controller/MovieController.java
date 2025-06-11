@@ -3,6 +3,7 @@ package com.example.demo.controller;
 import java.util.List;
 
 import com.example.demo.exception.ParamsInvalidException;
+import com.example.demo.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,10 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.demo.model.dto.MovieCardDto;
-import com.example.demo.model.dto.MovieDto;
-import com.example.demo.model.dto.MoviesFilterDto;
-import com.example.demo.model.dto.UserCert;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.MovieService;
 
@@ -33,7 +30,7 @@ import jakarta.servlet.http.HttpSession;
 public class MovieController {
   @Autowired
   private MovieService movieService;
-
+/*
   // 取得單一電影
   @GetMapping("/{id}")
   public ResponseEntity<ApiResponse<MovieDto>> getSpecificMovie(
@@ -45,10 +42,10 @@ public class MovieController {
     MovieDto movie = movieService.findById(id, userId);
     return ResponseEntity.ok(ApiResponse.success(movie));
   }
-
+*/
   // 取得所有電影
   @GetMapping
-  public ResponseEntity<ApiResponse<Page<MovieCardDto>>> getAllMovieCardDto(
+  public ResponseEntity<ApiResponse<Page<MovieCardView>>> getAllMovieCardDto(
       HttpSession httpSession,
       @RequestParam(defaultValue = "1") String page,
       @RequestParam(defaultValue = "score_desc") String sort,
@@ -60,7 +57,7 @@ public class MovieController {
       userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
     }
     // 分頁查詢
-    Page<MovieCardDto> moviePage = movieService.getMoviePage(userId, page, sort, type, keyword);
+    Page<MovieCardView> moviePage = movieService.getMoviePage(userId, page, sort, type, keyword);
     return ResponseEntity.ok(ApiResponse.success(moviePage));
   }
 
@@ -107,7 +104,7 @@ public class MovieController {
 //		List<MovieCardDto> movies = movieService.findByTitle("%"+keyword+"%", userId);
 //		return ResponseEntity.ok(ApiResponse.success(movies));
 //	}
-
+/*
   // 新增電影
   @PostMapping("/add")
   public ResponseEntity<ApiResponse<Void>> addMovie(
@@ -123,5 +120,5 @@ public class MovieController {
     movieService.addAll(movieDtos);
     return ResponseEntity.ok(ApiResponse.success("新增成功"));
   }
-
+*/
 }

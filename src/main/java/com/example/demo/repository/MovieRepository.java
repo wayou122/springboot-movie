@@ -3,11 +3,13 @@ package com.example.demo.repository;
 import java.util.List;
 import java.util.Optional;
 
+import com.example.demo.model.dto.MovieCardView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.example.demo.model.dto.MovieCardDto;
@@ -54,7 +56,8 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRep
 			""")
 	Page<MovieCardDto> findAllMovieCard(
 			Integer userId, Pageable pageable, List<String> typeFilter, String keywordFilter);
-//					AND (:keyword IS NULL OR m.title LIKE :keyword)
+
+	//
 	@Query(value= """
 			SELECT
 				m.movie_id,
@@ -75,7 +78,8 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRep
 				END
 				FROM Movie m
 				LEFT JOIN review r ON (r.movie_id =  m.movie_id)
-				WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
+				WHERE (:typeFilter IS NULL OR m.type IN (:typeFilter))
+					AND (:keyword IS NULL OR m.title LIKE :keyword)
 				GROUP BY m.movie_id
 				ORDER BY
 					CASE WHEN :sort = 'score_desc' THEN scoreAvg END DESC,
@@ -83,8 +87,47 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRep
 					CASE WHEN :sort = 'reviewCount_desc' THEN reviewCount END DESC,
 					m.release_date DESC, m.movie_id ASC
 			""", countQuery= """
-				SELECT COUNT(*) FROM movie m
+				SELECT COUNT(m.movie_id) FROM movie m
 			  WHERE (:typeFilter IS NULL OR m.type IN (:typeFilter))
 			""", nativeQuery = true)
 	Page<MovieCardDto> findAllMovieCardsNative(Integer userId, String sort, List<String> typeFilter, String keyword, Pageable pageable);
+
+
+
+@Query("""
+    SELECT
+        m.id as movieId,
+        m.title as title,
+        m.releaseDate as releaseDate,
+        m.type as type,
+        m.length as length,
+        m.posterUrl as posterUrl,
+        m.bannerUrl as bannerUrl,
+        m.director as director,
+        m.actor as actor,
+        m.rating as rating,
+        COALESCE(AVG(r.score), 0) as scoreAvg,
+        COUNT(r.id) as reviewCount,
+        CASE WHEN :userId IS NOT NULL AND EXISTS (
+		                                                   SELECT 1 FROM Movie m2 JOIN m2.watchlistUsers u\s
+		                                                   WHERE m2.id = m.id AND u.id = :userId
+		                                               ) THEN true ELSE false END
+    FROM Movie m
+    LEFT JOIN Review r ON r.movie = m
+    WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
+        AND (:keyword IS NULL OR m.title LIKE %:keyword%)
+    GROUP BY m.id
+    ORDER BY 
+        CASE WHEN :sort = 'score_desc' THEN COALESCE(AVG(r.score), 0) END DESC,
+        CASE WHEN :sort = 'score_asc' THEN COALESCE(AVG(r.score), 0) END ASC,
+        CASE WHEN :sort = 'reviewCount_desc' THEN COUNT(r.id) END DESC,
+        m.releaseDate DESC, m.id ASC
+""")
+Page<MovieCardView> findAllMovieCardsWithInterfaceProjection(
+		@Param("userId") Integer userId,
+		@Param("sort") String sort,
+		@Param("typeFilter") List<String> typeFilter,
+		@Param("keyword") String keyword,
+		Pageable pageable
+);
 }

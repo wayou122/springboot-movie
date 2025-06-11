@@ -5,6 +5,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
+import com.example.demo.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,10 +18,6 @@ import com.example.demo.exception.movieException.MovieNotFoundException;
 import com.example.demo.exception.userException.UserNotFoundException;
 import com.example.demo.mapper.MovieMapper;
 import com.example.demo.mapper.ReviewMapper;
-import com.example.demo.model.dto.MovieCardDto;
-import com.example.demo.model.dto.MovieDto;
-import com.example.demo.model.dto.MoviesFilterDto;
-import com.example.demo.model.dto.ReviewDto;
 import com.example.demo.model.entity.Movie;
 import com.example.demo.repository.MovieRepository;
 import com.example.demo.repository.UserRepository;
@@ -56,7 +53,8 @@ public class MovieServiceImpl implements MovieService {
 		return movieDto;
 	}
 
-	public Page<MovieCardDto> getMoviePage(
+	@Override
+	public Page<MovieCardView> getMoviePage(
 			Integer userId, String page, String sort, String type, String keyword){
 		// 帳號資訊 null維持null
 		if (userId != null && !userRepository.existsById(userId)) {
@@ -102,7 +100,7 @@ public class MovieServiceImpl implements MovieService {
 		// 分頁查詢
 		Pageable pageable = PageRequest.of(pageInt - 1, 5);
 		//return movieRepository.findAllMovieCard(userId, pageable, typeFilterList, keyword);
-		return movieRepository.findAllMovieCardsNative(userId, sort, typeFilterList, keyword, pageable);
+		return movieRepository.findAllMovieCardsWithInterfaceProjection(userId, sort, typeFilterList, keyword, pageable);
 	}
 
 	@Override

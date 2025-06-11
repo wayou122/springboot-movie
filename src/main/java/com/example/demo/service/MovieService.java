@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import java.util.List;
 
+import com.example.demo.model.dto.MovieCardView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -11,6 +12,7 @@ import com.example.demo.model.entity.Movie;
 import com.example.demo.model.dto.MovieCardDto;
 
 public interface MovieService {
+
 	List<MovieCardDto> findAll(Integer userId);
 	List<MovieCardDto> getFilteredMovies(MoviesFilterDto moviesFilterDto, Integer userId);
 	List<MovieCardDto> findByType(String type, Integer userId);
@@ -29,5 +31,5 @@ public interface MovieService {
 	MovieDto toDto(Movie movie, Integer usrId);
 	MovieCardDto toCardDto(Movie movie, Integer usrId);
 	Page<MovieCardDto> getMovieCardDtosPage(Integer userId, Pageable pageable, String typeFilter, String keyword);
-	Page<MovieCardDto> getMoviePage(Integer userId, String page, String sort, String type, String keyword);
+	Page<MovieCardView> getMoviePage(Integer userId, String page, String sort, String type, String keyword);
 }
