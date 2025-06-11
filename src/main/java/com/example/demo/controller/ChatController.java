@@ -1,7 +1,6 @@
 package com.example.demo.controller;
 
 import com.example.demo.model.dto.ChatMessageDto;
-import com.example.demo.model.entity.ChatMessage;
 import com.example.demo.response.ApiResponse;
 import com.example.demo.service.ChatMessageService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,10 +22,11 @@ public class ChatController {
   private ChatMessageService chatMessageService;
 
   @MessageMapping("/chatRoom/{roomName}") //接受前端送到/app/chatRoom/{roomId}的訊息
+  // chatMessageDto必須傳入userId, content, roomName
   public void getAndSendMessage(@DestinationVariable String roomName, ChatMessageDto chatMessageDto){
-    ChatMessageDto completedDto = chatMessageService.saveMessage(chatMessageDto);
+    ChatMessageDto responseDto = chatMessageService.saveMessage(chatMessageDto);
     //發送訊息到/topic/messages/{roomId}
-    simpMessagingTemplate.convertAndSend("/topic/messages/"+roomName, completedDto);
+    simpMessagingTemplate.convertAndSend("/topic/messages/"+roomName, responseDto);
   }
 
   @GetMapping("/chat/{chatRoom}")

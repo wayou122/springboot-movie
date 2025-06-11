@@ -7,7 +7,9 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.exception.ParamsInvalidException;
@@ -24,6 +26,7 @@ import com.example.demo.repository.MovieRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MovieService;
 import com.example.demo.service.ReviewService;
+import org.springframework.util.StringUtils;
 
 @Service
 public class MovieServiceImpl implements MovieService {
@@ -40,14 +43,8 @@ public class MovieServiceImpl implements MovieService {
 	@Autowired
 	ReviewMapper reviewMapper;
 
-	private	Map<String,String> typeMap = 
+	private	final Map<String,String> typeMap =
 			Map.of("all","全部","drama","劇情片","documentary","紀錄片","animation","動畫","short","短片","other","其他");
-
-	@Override
-	public List<MovieCardDto> findAll(Integer userId) {
-		List<Movie> movies = movieRepository.findAllWithReviews();
-		return toCardDtoList(movies, userId);
-	}
 
 	@Override
 	public MovieDto findById(Integer movieId, Integer userId) {
@@ -57,6 +54,85 @@ public class MovieServiceImpl implements MovieService {
 		List<ReviewDto> reviewDtos = reviewService.toDtoList(movie.getReviews(), userId);
 		movieDto.setReviews(reviewDtos);
 		return movieDto;
+	}
+
+	public Page<MovieCardDto> getMoviePage(
+			Integer userId, String page, String sort, String type, String keyword){
+		// 帳號資訊 null維持null
+		if (userId != null && !userRepository.existsById(userId)) {
+			throw new UserNotFoundException();
+		}
+		// 頁數
+		int pageInt = 1;
+		try {
+			pageInt = Integer.parseInt(page);
+			if (pageInt < 1){
+				pageInt = 1;
+			}
+		} catch (NumberFormatException e) {
+			pageInt = 1;
+		}
+		// 排序
+		Sort sortOption = switch (sort) {
+			case "score_desc" -> Sort.by(Sort.Direction.DESC, "scoreAvg");
+			case "score_asc" -> Sort.by(Sort.Direction.ASC, "scoreAvg");
+			case "reviewCount_desc" -> Sort.by(Sort.Direction.DESC, "reviewCount");
+			case "releaseDate_desc" -> Sort.by(Sort.Direction.DESC, "releaseDate");
+			default -> throw new ParamsInvalidException();
+		};
+		sortOption.and(Sort.by(Sort.Direction.DESC, "releaseDate")).and(Sort.by(Sort.Direction.ASC,"movieId"));
+
+		// 類型
+		List<String> typeFilterList;
+		if (!typeMap.containsKey(type)) {
+			throw new ParamsInvalidException();
+		}else if(type.equalsIgnoreCase("all")){
+			typeFilterList = null;
+		}else if (type.equals("other")) {
+			typeFilterList = List.of("未定","其他類型");
+		}else {
+			typeFilterList = List.of(typeMap.get(type));
+		}
+		//關鍵字
+		if (keyword.trim().isBlank()) {
+			keyword = null;
+		} else{
+			keyword = "%" +keyword+ "%";
+		}
+		// 分頁查詢
+		Pageable pageable = PageRequest.of(pageInt - 1, 5);
+		//return movieRepository.findAllMovieCard(userId, pageable, typeFilterList, keyword);
+		return movieRepository.findAllMovieCardsNative(userId, sort, typeFilterList, keyword, pageable);
+	}
+
+	@Override
+	public Page<MovieCardDto> getMovieCardDtosPage(
+			Integer userId, Pageable pageable, String typeFilter, String keyword) {
+		if (userId != null && !userRepository.existsById(userId)) {
+			throw new UserNotFoundException();
+		}
+		List<String> typeFilterList;
+		if (!typeMap.containsKey(typeFilter)) {
+			throw new ParamsInvalidException();
+		}else if(typeFilter.equalsIgnoreCase("all")){
+			typeFilterList = null;
+		}else if (typeFilter.equals("other")) {
+			typeFilterList = List.of("未定","其他類型");
+		}else {
+			typeFilterList = List.of(typeMap.get(typeFilter));
+		}
+		String keywordFilter = null;
+		if (keyword != null && !keyword.isBlank()){
+			keywordFilter = "%"+keyword+"%";
+		}
+		return movieRepository.findAllMovieCard(userId, pageable, typeFilterList, keywordFilter);
+	}
+
+	//abandoned
+	@Override
+	public List<MovieCardDto> findAll(Integer userId) {
+		List<Movie> movies = movieRepository.findAllWithReviews();
+		return toCardDtoList(movies, userId);
 	}
 
 	// abandoned
@@ -221,26 +297,4 @@ public class MovieServiceImpl implements MovieService {
 		return dto;
 	}
 
-	@Override
-  public Page<MovieCardDto> getMovieCardDtosPage(
-      Integer userId, Pageable pageable, String typeFilter, String keyword) {
-		if (userId != null && !userRepository.existsById(userId)) {
-			throw new UserNotFoundException();
-		}
-		List<String> typeFilterList; 
-		if (!typeMap.containsKey(typeFilter)) {
-			throw new ParamsInvalidException();
-		}else if(typeFilter.equalsIgnoreCase("all")){
-			typeFilterList = null;
-		}else if (typeFilter.equals("other")) {
-			typeFilterList = List.of("未定","其他類型");
-		}else {
-			typeFilterList = List.of(typeMap.get(typeFilter));
-		}
-    String keywordFilter = null;
-    if (keyword != null && !keyword.isBlank()){
-      keywordFilter = "%"+keyword+"%";
-    }
-		return movieRepository.findAllMovieCard(userId, pageable, typeFilterList, keywordFilter);
-	}
 }

@@ -59,25 +59,9 @@ public class MovieController {
     if (httpSession.getAttribute("userCert") != null) {
       userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
     }
-    // 頁數
-    int pageInteger = 1;
-    try {
-      pageInteger = Integer.parseInt(page);
-    } catch (NumberFormatException e) {
-      throw new ParamsInvalidException();
-    }
-    // 排序
-    Sort sortOption = switch (sort) {
-      case "score_desc" -> Sort.by(Sort.Direction.DESC, "scoreAvg");
-      case "score_asc" -> Sort.by(Sort.Direction.ASC, "scoreAvg");
-      case "reviewCount_desc" -> Sort.by(Sort.Direction.DESC, "reviewCount");
-      case "releaseDate_desc" -> Sort.by(Sort.Direction.DESC, "releaseDate");
-      default -> throw new ParamsInvalidException();
-    };
     // 分頁查詢
-    Pageable pageable = PageRequest.of(pageInteger - 1, 10, sortOption);
-    Page<MovieCardDto> dtos = movieService.getMovieCardDtosPage(userId, pageable, type,keyword);
-    return ResponseEntity.ok(ApiResponse.success(dtos));
+    Page<MovieCardDto> moviePage = movieService.getMoviePage(userId, page, sort, type, keyword);
+    return ResponseEntity.ok(ApiResponse.success(moviePage));
   }
 
 //	@GetMapping

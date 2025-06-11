@@ -49,12 +49,42 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRep
 			 			 ELSE false END
 			)
 			FROM Movie m
-			LEFT JOIN m.reviews r
-			LEFT JOIN m.watchlistUsers u
 			WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
-			AND (:keywordFilter IS NULL OR m.title LIKE :keywordFilter)
+			AND (:keywordFilter IS NULL OR m.title LIKE %:keywordFilter%)
 			""")
 	Page<MovieCardDto> findAllMovieCard(
 			Integer userId, Pageable pageable, List<String> typeFilter, String keywordFilter);
-	
+//					AND (:keyword IS NULL OR m.title LIKE :keyword)
+	@Query(value= """
+			SELECT
+				m.movie_id,
+				m.title,
+				m.release_date,
+				m.type,
+				m.length,
+				m.poster_url,
+				m.banner_url,
+				m.director,
+				m.actor,
+				m.rating,
+				COALESCE(AVG(r.score), 0) AS scoreAvg,
+			  COUNT(r.review_id) AS reviewCount,
+			  CASE WHEN :userId IS NOT NULL AND EXISTS(
+			  	SELECT 1 FROM watchlist w WHERE w.movie_id = m.movie_id AND w.user_id = :userId
+			  	) THEN true ELSE false
+				END
+				FROM Movie m
+				LEFT JOIN review r ON (r.movie_id =  m.movie_id)
+				WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
+				GROUP BY m.movie_id
+				ORDER BY
+					CASE WHEN :sort = 'score_desc' THEN scoreAvg END DESC,
+					CASE WHEN :sort = 'score_asc' THEN scoreAvg END ASC,
+					CASE WHEN :sort = 'reviewCount_desc' THEN reviewCount END DESC,
+					m.release_date DESC, m.movie_id ASC
+			""", countQuery= """
+				SELECT COUNT(*) FROM movie m
+			  WHERE (:typeFilter IS NULL OR m.type IN (:typeFilter))
+			""", nativeQuery = true)
+	Page<MovieCardDto> findAllMovieCardsNative(Integer userId, String sort, List<String> typeFilter, String keyword, Pageable pageable);
 }

@@ -28,6 +28,6 @@ public interface MovieService {
 	List<MovieDto> toDtoList(List<Movie> movies, Integer userId);
 	MovieDto toDto(Movie movie, Integer usrId);
 	MovieCardDto toCardDto(Movie movie, Integer usrId);
-	Page<MovieCardDto> getMovieCardDtosPage(
-			Integer userId, Pageable pageable, String typeFilter, String keyword);
+	Page<MovieCardDto> getMovieCardDtosPage(Integer userId, Pageable pageable, String typeFilter, String keyword);
+	Page<MovieCardDto> getMoviePage(Integer userId, String page, String sort, String type, String keyword);
 }
