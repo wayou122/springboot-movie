@@ -40,7 +40,7 @@ public class UserController {
 	@GetMapping("/account")
 	public ResponseEntity<ApiResponse<UserDto>> info(HttpSession httpSession){
 		if (httpSession.getAttribute("userCert") == null) {
-			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.BAD_REQUEST,"尚未登入"));
+			return ResponseEntity.ok(ApiResponse.success("尚未登入",null));
 		}
 		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
 		UserDto userDto = userService.getUserById(userCert.getUserId()); 

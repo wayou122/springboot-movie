@@ -14,9 +14,8 @@ public interface ReviewService {
 	void deleteReview(Integer reviewId, Integer userId);
 	void updateReview(ReviewDto reviewDto, Integer reviewId, Integer userId);
 	void toggleReaction(Integer userId, Integer reviewId, Integer reaction);
-	Page<ReviewMovieCardDto> getReviewMovieCardDtosPage(Integer userId, Pageable pageable, Integer scoreFilter);
+	Page<ReviewMovieCardDto> getReviewMovieCardPage(Integer userId, String page, String sort, String score);
+	Page<ReviewMovieCardDto> getPersonalReviewMovieCardPage(String reviewerName, Integer userId, String page);
 	List<ReviewDto> toDtoList (List<Review> reviews, Integer userId);
 	Integer calculateLikeCount(Review review);
-
-
 }

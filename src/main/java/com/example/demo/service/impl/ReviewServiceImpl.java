@@ -7,9 +7,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.example.demo.exception.ParamsInvalidException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import com.example.demo.exception.AccessInvalidException;
@@ -117,12 +120,58 @@ public class ReviewServiceImpl implements ReviewService {
 
 	//取得所有電影評論
 	@Override
-	public Page<ReviewMovieCardDto> getReviewMovieCardDtosPage(
-			Integer userId, Pageable pageable, Integer scoreFilter) {
+	public Page<ReviewMovieCardDto> getReviewMovieCardPage(
+			Integer userId, String page, String sort, String score) {
 		if (userId != null && !userRepository.existsById(userId)) {
 			throw new UserNotFoundException();
 		}
-		return reviewRepository.findAllReviewMovieCard(userId, pageable, scoreFilter);
+		// 頁數
+		int pageInteger = 1;
+		try {
+			pageInteger = Integer.parseInt(page);
+		}catch(NumberFormatException e) {
+			pageInteger = 1;
+		}
+		// 排序
+		Sort sortOption = switch (sort){
+			case "new" -> Sort.by(Sort.Direction.DESC, "createdDate");
+			case "popular" -> Sort.by(Sort.Direction.DESC, "likeCount");
+			default -> throw new ParamsInvalidException();
+		};
+		Pageable pageable = PageRequest.of(pageInteger - 1, 10, sortOption);
+		// 分數篩選
+		Integer scoreInteger = null; // null表示所有分數
+		if (!score.equalsIgnoreCase("all")) {
+			try {
+				scoreInteger = Integer.parseInt(score);
+				if (scoreInteger <1 || scoreInteger >5) {
+					throw new ParamsInvalidException("分數應在1~5之間");
+				}
+			} catch(NumberFormatException e) {
+				throw new ParamsInvalidException();
+			}
+		}
+		return reviewRepository.findAllReviewMovieCard(userId, pageable, scoreInteger);
+	}
+
+	//取得影評人電影評論
+	public Page<ReviewMovieCardDto> getPersonalReviewMovieCardPage(
+			String reviewerName, Integer userId, String page) {
+		User reviewer = userRepository.findByUsername(reviewerName)
+				.orElseThrow(()->new UserNotFoundException("影評人不存在"));
+		Integer reviewerId = reviewer.getUserId();
+		if (userId != null && !userRepository.existsById(userId)) {
+			throw new UserNotFoundException();
+		}
+		//頁數
+		int pageInteger = 1;
+		try {
+			pageInteger = Integer.parseInt(page);
+		}catch(NumberFormatException e) {
+			pageInteger = 1;
+		}
+		Pageable pageable = PageRequest.of(pageInteger - 1, 10);
+		return reviewRepository.findPersonalReviewMovieCard(reviewerId, userId, pageable);
 	}
 	
 	@Override
@@ -134,6 +183,7 @@ public class ReviewServiceImpl implements ReviewService {
 			ReviewDto dto = reviewMapper.toDto(review);
 			dto.setAuthorId(review.getUser().getUserId());
 			dto.setAuthorName(review.getUser().getUsername());
+			dto.setAuthorImagePath(review.getUser().getImagePath());
 			dto.setLikeCount(calculateLikeCount(review));
 			dto.setReaction(reactionMap.getOrDefault(review.getReviewId(),0));
 			dto.setCreatedDate(review.getCreatedDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));

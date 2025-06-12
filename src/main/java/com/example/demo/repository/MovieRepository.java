@@ -16,21 +16,50 @@ import com.example.demo.model.dto.MovieCardDto;
 import com.example.demo.model.entity.Movie;
 
 @Repository
-public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRepositoryCustom{
-	
-	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.movieId IN :moviesId")
-	List<Movie> findAllWithReviewsByIds(List<Integer> moviesId);
-	
-	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.type = :type")
-	List<Movie> findByType(String type);
-	
-	@Query("SELECT m FROM Movie m LEFT JOIN FETCH m.reviews")
-	List<Movie> findAllWithReviews();
-	
+public interface MovieRepository extends JpaRepository<Movie, Integer>{
+
+	// 搜尋單一電影
 	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.movieId = :movieId")
 	Optional<Movie> findByIdWithReviews(Integer movieId);
-	
-	//電影卡
+
+	//搜尋電影卡
+	@Query("""
+    SELECT
+      m.movieId as movieId,
+      m.title as title,
+      m.releaseDate as releaseDate,
+      m.type as type,
+      m.length as length,
+      m.posterUrl as posterUrl,
+      m.bannerUrl as bannerUrl,
+      m.director as director,
+      m.actor as actor,
+      m.rating as rating,
+      COALESCE(AVG(r.score), 0) as scoreAvg,
+      COUNT(r.id) as reviewCount,
+      CASE WHEN :userId IS NOT NULL AND EXISTS (
+		     SELECT 1 FROM Movie m2 JOIN m2.watchlistUsers u
+		       WHERE m2.id = m.id AND u.id = :userId
+		     ) THEN true ELSE false END as collected
+    FROM Movie m
+    LEFT JOIN Review r ON r.movie = m
+    WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
+        AND (:keyword IS NULL OR m.title LIKE :keyword)
+    GROUP BY m.movieId
+    ORDER BY
+        CASE WHEN :sort = 'score_desc' THEN COALESCE(AVG(r.score), 0) END DESC,
+        CASE WHEN :sort = 'score_asc' THEN COALESCE(AVG(r.score), 0) END ASC,
+        CASE WHEN :sort = 'reviewCount_desc' THEN COUNT(r.id) END DESC,
+        m.releaseDate DESC, m.id ASC
+	""")
+	Page<MovieCardView> findAllMovieCardsWithInterfaceProjection(
+			@Param("userId") Integer userId,
+			@Param("sort") String sort,
+			@Param("typeFilter") List<String> typeFilter,
+			@Param("keyword") String keyword,
+			Pageable pageable);
+
+	//abandoned 搜尋電影卡，sort排序依照計算欄位會不穩定，order by無法寫case
 	@Query("""
 			SELECT new com.example.demo.model.dto.MovieCardDto(
 				m.movieId,
@@ -57,77 +86,15 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>, MovieRep
 	Page<MovieCardDto> findAllMovieCard(
 			Integer userId, Pageable pageable, List<String> typeFilter, String keywordFilter);
 
-	//
-	@Query(value= """
-			SELECT
-				m.movie_id,
-				m.title,
-				m.release_date,
-				m.type,
-				m.length,
-				m.poster_url,
-				m.banner_url,
-				m.director,
-				m.actor,
-				m.rating,
-				COALESCE(AVG(r.score), 0) AS scoreAvg,
-			  COUNT(r.review_id) AS reviewCount,
-			  CASE WHEN :userId IS NOT NULL AND EXISTS(
-			  	SELECT 1 FROM watchlist w WHERE w.movie_id = m.movie_id AND w.user_id = :userId
-			  	) THEN true ELSE false
-				END
-				FROM Movie m
-				LEFT JOIN review r ON (r.movie_id =  m.movie_id)
-				WHERE (:typeFilter IS NULL OR m.type IN (:typeFilter))
-					AND (:keyword IS NULL OR m.title LIKE :keyword)
-				GROUP BY m.movie_id
-				ORDER BY
-					CASE WHEN :sort = 'score_desc' THEN scoreAvg END DESC,
-					CASE WHEN :sort = 'score_asc' THEN scoreAvg END ASC,
-					CASE WHEN :sort = 'reviewCount_desc' THEN reviewCount END DESC,
-					m.release_date DESC, m.movie_id ASC
-			""", countQuery= """
-				SELECT COUNT(m.movie_id) FROM movie m
-			  WHERE (:typeFilter IS NULL OR m.type IN (:typeFilter))
-			""", nativeQuery = true)
-	Page<MovieCardDto> findAllMovieCardsNative(Integer userId, String sort, List<String> typeFilter, String keyword, Pageable pageable);
+	// abandoned
+	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.movieId IN :moviesId")
+	List<Movie> findAllWithReviewsByIds(List<Integer> moviesId);
+
+	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.type = :type")
+	List<Movie> findByType(String type);
+
+	@Query("SELECT m FROM Movie m LEFT JOIN FETCH m.reviews")
+	List<Movie> findAllWithReviews();
 
 
-
-@Query("""
-    SELECT
-        m.id as movieId,
-        m.title as title,
-        m.releaseDate as releaseDate,
-        m.type as type,
-        m.length as length,
-        m.posterUrl as posterUrl,
-        m.bannerUrl as bannerUrl,
-        m.director as director,
-        m.actor as actor,
-        m.rating as rating,
-        COALESCE(AVG(r.score), 0) as scoreAvg,
-        COUNT(r.id) as reviewCount,
-        CASE WHEN :userId IS NOT NULL AND EXISTS (
-		                                                   SELECT 1 FROM Movie m2 JOIN m2.watchlistUsers u\s
-		                                                   WHERE m2.id = m.id AND u.id = :userId
-		                                               ) THEN true ELSE false END
-    FROM Movie m
-    LEFT JOIN Review r ON r.movie = m
-    WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
-        AND (:keyword IS NULL OR m.title LIKE %:keyword%)
-    GROUP BY m.id
-    ORDER BY 
-        CASE WHEN :sort = 'score_desc' THEN COALESCE(AVG(r.score), 0) END DESC,
-        CASE WHEN :sort = 'score_asc' THEN COALESCE(AVG(r.score), 0) END ASC,
-        CASE WHEN :sort = 'reviewCount_desc' THEN COUNT(r.id) END DESC,
-        m.releaseDate DESC, m.id ASC
-""")
-Page<MovieCardView> findAllMovieCardsWithInterfaceProjection(
-		@Param("userId") Integer userId,
-		@Param("sort") String sort,
-		@Param("typeFilter") List<String> typeFilter,
-		@Param("keyword") String keyword,
-		Pageable pageable
-);
 }

@@ -1,9 +1,6 @@
 package com.example.demo.service.impl;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.example.demo.model.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +20,6 @@ import com.example.demo.repository.MovieRepository;
 import com.example.demo.repository.UserRepository;
 import com.example.demo.service.MovieService;
 import com.example.demo.service.ReviewService;
-import org.springframework.util.StringUtils;
 
 @Service
 public class MovieServiceImpl implements MovieService {
@@ -43,6 +39,7 @@ public class MovieServiceImpl implements MovieService {
 	private	final Map<String,String> typeMap =
 			Map.of("all","全部","drama","劇情片","documentary","紀錄片","animation","動畫","short","短片","other","其他");
 
+	// 搜尋單一電影
 	@Override
 	public MovieDto findById(Integer movieId, Integer userId) {
 		Movie movie = movieRepository.findByIdWithReviews(movieId)
@@ -53,6 +50,7 @@ public class MovieServiceImpl implements MovieService {
 		return movieDto;
 	}
 
+	// 搜尋分頁電影
 	@Override
 	public Page<MovieCardView> getMoviePage(
 			Integer userId, String page, String sort, String type, String keyword){
@@ -71,15 +69,10 @@ public class MovieServiceImpl implements MovieService {
 			pageInt = 1;
 		}
 		// 排序
-		Sort sortOption = switch (sort) {
-			case "score_desc" -> Sort.by(Sort.Direction.DESC, "scoreAvg");
-			case "score_asc" -> Sort.by(Sort.Direction.ASC, "scoreAvg");
-			case "reviewCount_desc" -> Sort.by(Sort.Direction.DESC, "reviewCount");
-			case "releaseDate_desc" -> Sort.by(Sort.Direction.DESC, "releaseDate");
-			default -> throw new ParamsInvalidException();
-		};
-		sortOption.and(Sort.by(Sort.Direction.DESC, "releaseDate")).and(Sort.by(Sort.Direction.ASC,"movieId"));
-
+		Set<String> sorSet =Set.of("score_desc","score_asc" ,"reviewCount_desc","releaseDate_desc");
+		if (!sorSet.contains(sort)){
+			throw new ParamsInvalidException();
+		}
 		// 類型
 		List<String> typeFilterList;
 		if (!typeMap.containsKey(type)) {
@@ -98,32 +91,20 @@ public class MovieServiceImpl implements MovieService {
 			keyword = "%" +keyword+ "%";
 		}
 		// 分頁查詢
-		Pageable pageable = PageRequest.of(pageInt - 1, 5);
-		//return movieRepository.findAllMovieCard(userId, pageable, typeFilterList, keyword);
+		Pageable pageable = PageRequest.of(pageInt - 1, 10);
 		return movieRepository.findAllMovieCardsWithInterfaceProjection(userId, sort, typeFilterList, keyword, pageable);
 	}
 
+	// 新增電影
 	@Override
-	public Page<MovieCardDto> getMovieCardDtosPage(
-			Integer userId, Pageable pageable, String typeFilter, String keyword) {
-		if (userId != null && !userRepository.existsById(userId)) {
-			throw new UserNotFoundException();
-		}
-		List<String> typeFilterList;
-		if (!typeMap.containsKey(typeFilter)) {
-			throw new ParamsInvalidException();
-		}else if(typeFilter.equalsIgnoreCase("all")){
-			typeFilterList = null;
-		}else if (typeFilter.equals("other")) {
-			typeFilterList = List.of("未定","其他類型");
-		}else {
-			typeFilterList = List.of(typeMap.get(typeFilter));
-		}
-		String keywordFilter = null;
-		if (keyword != null && !keyword.isBlank()){
-			keywordFilter = "%"+keyword+"%";
-		}
-		return movieRepository.findAllMovieCard(userId, pageable, typeFilterList, keywordFilter);
+	public void add(MovieDto movieDto) {
+		movieRepository.save(movieMapper.toEntity(movieDto));
+	}
+
+	@Override
+	public void addAll(List<MovieDto> movieDtos) {
+		List<Movie> movies = movieDtos.stream().map(m -> movieMapper.toEntity(m)).toList();
+		movieRepository.saveAll(movies);
 	}
 
 	//abandoned
@@ -131,17 +112,6 @@ public class MovieServiceImpl implements MovieService {
 	public List<MovieCardDto> findAll(Integer userId) {
 		List<Movie> movies = movieRepository.findAllWithReviews();
 		return toCardDtoList(movies, userId);
-	}
-
-	// abandoned
-	@Override
-	public List<MovieCardDto> findMoviesByFilter(MoviesFilterDto filter, Integer userId) {
-		List<Movie> movies = movieRepository.findMoviesByFilter(filter, userId);
-		if (movies == null) {
-			return null;
-		}
-		List<MovieCardDto> dtos = toCardDtoList(movies, userId);
-		return sortMovies(dtos, filter.getSort());
 	}
 
 	// abandoned
@@ -204,7 +174,7 @@ public class MovieServiceImpl implements MovieService {
 		return sortMovies(movies, sort);
 	}
 
-//abandoned
+	//abandoned
 	@Override
 	public List<MovieCardDto> findWatchlist(Integer userId) {
 		List<Integer> movieIds = userRepository.findWatchlistMovieIds(userId);
@@ -212,7 +182,7 @@ public class MovieServiceImpl implements MovieService {
 		return toCardDtoList(movies, userId);
 	}
 
-//abandoned
+	//abandoned
 	@Override
 	public List<MovieCardDto> findByType(String type, Integer userId) {
 		List<Movie> movies;
@@ -231,19 +201,8 @@ public class MovieServiceImpl implements MovieService {
 	}
 
 	@Override
-	public void add(MovieDto movieDto) {
-		movieRepository.save(movieMapper.toEntity(movieDto));
-	}
-
-	@Override
-	public void addAll(List<MovieDto> movieDtos) {
-		List<Movie> movies = movieDtos.stream().map(m -> movieMapper.toEntity(m)).toList();
-		movieRepository.saveAll(movies);
-	}
-
-	@Override
 	public Long calculateReviewCount(Movie movie) {
-		return Long.valueOf( movie.getReviews().size());
+		return (long) movie.getReviews().size();
 	}
 
 	@Override

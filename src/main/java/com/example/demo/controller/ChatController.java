@@ -21,11 +21,11 @@ public class ChatController {
   @Autowired
   private ChatMessageService chatMessageService;
 
-  @MessageMapping("/chatRoom/{roomName}") //接受前端送到/app/chatRoom/{roomId}的訊息
+  @MessageMapping("/chatRoom/{roomName}") //接受前端送到/app/chatRoom/{roomName}的訊息
   // chatMessageDto必須傳入userId, content, roomName
   public void getAndSendMessage(@DestinationVariable String roomName, ChatMessageDto chatMessageDto){
     ChatMessageDto responseDto = chatMessageService.saveMessage(chatMessageDto);
-    //發送訊息到/topic/messages/{roomId}
+    //發送訊息到/topic/messages/{roomName}
     simpMessagingTemplate.convertAndSend("/topic/messages/"+roomName, responseDto);
   }
 

@@ -48,33 +48,22 @@ public class ReviewController {
 		if (httpSession.getAttribute("userCert") != null) {
 			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
 		}
-		// 頁數
-		int pageInteger = 1;
-		try {
-			pageInteger = Integer.parseInt(page);
-		}catch(NumberFormatException e) {
-			throw new ParamsInvalidException();
+		Page<ReviewMovieCardDto> dtos = reviewService.getReviewMovieCardPage(userId, page, sort, score);
+		return ResponseEntity.ok(ApiResponse.success("查詢成功",dtos));
+	}
+
+	//取得影評人評論
+	@GetMapping("/reviewer/{reviewerName}")
+	public ResponseEntity<ApiResponse<Page<ReviewMovieCardDto>>> getPersonalReviews(
+			@PathVariable String reviewerName,
+			@RequestParam(defaultValue = "1") String page,
+			HttpSession httpSession){
+		// 使用者資訊
+		Integer userId = null;
+		if (httpSession.getAttribute("userCert") != null) {
+			userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
 		}
-		// 排序
-		Sort sortOption = switch (sort){
-			case "new" -> Sort.by(Sort.Direction.DESC, "createdDate");
-			case "popular" -> Sort.by(Sort.Direction.DESC, "likeCount");
-			default -> throw new ParamsInvalidException();
-		};
-		Pageable pageable = PageRequest.of(pageInteger - 1, 10, sortOption);
-		// 分數篩選
-		Integer scoreInteger = null; // null表示所有分數
-		if (!score.equalsIgnoreCase("all")) {
-			try {
-				scoreInteger = Integer.parseInt(score);
-				if (scoreInteger <1 || scoreInteger >5) {
-					throw new ParamsInvalidException("分數應在1~5之間");
-				}
-			} catch(NumberFormatException e) {
-				throw new ParamsInvalidException();
-			}
-		}
-		Page<ReviewMovieCardDto> dtos = reviewService.getReviewMovieCardDtosPage(userId, pageable, scoreInteger);
+		Page<ReviewMovieCardDto> dtos = reviewService.getPersonalReviewMovieCardPage(reviewerName, userId, page);
 		return ResponseEntity.ok(ApiResponse.success("查詢成功",dtos));
 	}
 
