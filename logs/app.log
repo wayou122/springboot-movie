@@ -5750,3 +5750,60 @@ Identify and stop the process that's listening on port 8085 or configure this ap
 2025-06-12T17:28:51.280+08:00  INFO 1896 --- [springboot-movie] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
 2025-06-12T17:28:51.280+08:00  INFO 1896 --- [springboot-movie] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
 2025-06-12T17:28:51.284+08:00  INFO 1896 --- [springboot-movie] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2025-06-12T21:21:15.115+08:00  INFO 418636 --- [springboot-movie] [main] c.e.demo.SpringbootMovieApplication      : Starting SpringbootMovieApplication using Java 22.0.2 with PID 418636 (D:\WEB\movie\springboot-movie\target\classes started by user in D:\WEB\movie\springboot-movie)
+2025-06-12T21:21:15.115+08:00  INFO 418636 --- [springboot-movie] [main] c.e.demo.SpringbootMovieApplication      : No active profile set, falling back to 1 default profile: "default"
+2025-06-12T21:21:17.029+08:00  INFO 418636 --- [springboot-movie] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-12T21:21:17.029+08:00  INFO 418636 --- [springboot-movie] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JDBC repositories in DEFAULT mode.
+2025-06-12T21:21:17.154+08:00  INFO 418636 --- [springboot-movie] [main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.example.demo.repository.ChatMessageRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2025-06-12T21:21:17.169+08:00  INFO 418636 --- [springboot-movie] [main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.example.demo.repository.MovieRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2025-06-12T21:21:17.169+08:00  INFO 418636 --- [springboot-movie] [main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.example.demo.repository.ReviewReactionRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2025-06-12T21:21:17.185+08:00  INFO 418636 --- [springboot-movie] [main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.example.demo.repository.ReviewRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2025-06-12T21:21:17.185+08:00  INFO 418636 --- [springboot-movie] [main] .RepositoryConfigurationExtensionSupport : Spring Data JDBC - Could not safely identify store assignment for repository candidate interface com.example.demo.repository.UserRepository; If you want this repository to be a JDBC repository, consider annotating your entities with one of these annotations: org.springframework.data.relational.core.mapping.Table.
+2025-06-12T21:21:17.185+08:00  INFO 418636 --- [springboot-movie] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 134 ms. Found 0 JDBC repository interfaces.
+2025-06-12T21:21:17.216+08:00  INFO 418636 --- [springboot-movie] [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-06-12T21:21:17.216+08:00  INFO 418636 --- [springboot-movie] [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-06-12T21:21:17.405+08:00  INFO 418636 --- [springboot-movie] [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 174 ms. Found 5 JPA repository interfaces.
+2025-06-12T21:21:18.737+08:00  INFO 418636 --- [springboot-movie] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8085 (http)
+2025-06-12T21:21:18.768+08:00  INFO 418636 --- [springboot-movie] [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-06-12T21:21:18.768+08:00  INFO 418636 --- [springboot-movie] [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.40]
+2025-06-12T21:21:18.893+08:00  INFO 418636 --- [springboot-movie] [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-06-12T21:21:18.893+08:00  INFO 418636 --- [springboot-movie] [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 3599 ms
+2025-06-12T21:21:19.320+08:00  INFO 418636 --- [springboot-movie] [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-06-12T21:21:19.448+08:00  INFO 418636 --- [springboot-movie] [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.13.Final
+2025-06-12T21:21:19.535+08:00  INFO 418636 --- [springboot-movie] [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-06-12T21:21:20.116+08:00  INFO 418636 --- [springboot-movie] [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-06-12T21:21:20.178+08:00  INFO 418636 --- [springboot-movie] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-06-12T21:21:20.472+08:00  INFO 418636 --- [springboot-movie] [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@69a73867
+2025-06-12T21:21:20.472+08:00  INFO 418636 --- [springboot-movie] [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-06-12T21:21:20.617+08:00  INFO 418636 --- [springboot-movie] [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 8.0.42
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-06-12T21:21:22.472+08:00  INFO 418636 --- [springboot-movie] [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-06-12T21:21:22.597+08:00  INFO 418636 --- [springboot-movie] [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-06-12T21:21:23.295+08:00  INFO 418636 --- [springboot-movie] [main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+2025-06-12T21:21:27.181+08:00  INFO 418636 --- [springboot-movie] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Starting...
+2025-06-12T21:21:27.181+08:00  INFO 418636 --- [springboot-movie] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=true, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@3f3fdc07]]
+2025-06-12T21:21:27.181+08:00  INFO 418636 --- [springboot-movie] [main] o.s.m.s.b.SimpleBrokerMessageHandler     : Started.
+2025-06-12T21:21:27.212+08:00  INFO 418636 --- [springboot-movie] [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8085 (http) with context path '/'
+2025-06-12T21:21:27.212+08:00  INFO 418636 --- [springboot-movie] [main] c.e.demo.SpringbootMovieApplication      : Started SpringbootMovieApplication in 13.456 seconds (process running for 14.486)
+2025-06-12T21:21:34.443+08:00  INFO 418636 --- [springboot-movie] [http-nio-8085-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-06-12T21:21:34.443+08:00  INFO 418636 --- [springboot-movie] [http-nio-8085-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-06-12T21:21:34.443+08:00  INFO 418636 --- [springboot-movie] [http-nio-8085-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 0 ms
+2025-06-12T21:21:34.907+08:00  WARN 418636 --- [springboot-movie] [http-nio-8085-exec-1] ration$PageModule$WarningLoggingModifier : Serializing PageImpl instances as-is is not supported, meaning that there is no guarantee about the stability of the resulting JSON structure!
+	For a stable JSON structure, please use Spring Data's PagedModel (globally via @EnableSpringDataWebSupport(pageSerializationMode = VIA_DTO))
+	or Spring HATEOAS and Spring Data's PagedResourcesAssembler as documented in https://docs.spring.io/spring-data/commons/reference/repositories/core-extensions.html#core.web.pageables.
+
+2025-06-12T21:22:27.175+08:00  INFO 418636 --- [springboot-movie] [MessageBroker-1] o.s.w.s.c.WebSocketMessageBrokerStats    : WebSocketSession[0 current WS(0)-HttpStream(0)-HttpPoll(0), 0 total, 0 closed abnormally (0 connect failure, 0 send limit, 0 transport error)], stompSubProtocol[processed CONNECT(0)-CONNECTED(0)-DISCONNECT(0)], stompBrokerRelay[null], inboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], outboundChannel[pool size = 0, active threads = 0, queued tasks = 0, completed tasks = 0], sockJsScheduler[pool size = 1, active threads = 1, queued tasks = 0, completed tasks = 0]
+2025-06-12T21:34:59.348+08:00  INFO 418636 --- [springboot-movie] [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-06-12T21:34:59.380+08:00  INFO 418636 --- [springboot-movie] [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-06-12T21:34:59.401+08:00  INFO 418636 --- [springboot-movie] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopping...
+2025-06-12T21:34:59.401+08:00  INFO 418636 --- [springboot-movie] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : BrokerAvailabilityEvent[available=false, SimpleBrokerMessageHandler [org.springframework.messaging.simp.broker.DefaultSubscriptionRegistry@3f3fdc07]]
+2025-06-12T21:34:59.401+08:00  INFO 418636 --- [springboot-movie] [SpringApplicationShutdownHook] o.s.m.s.b.SimpleBrokerMessageHandler     : Stopped.
+2025-06-12T21:34:59.436+08:00  INFO 418636 --- [springboot-movie] [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-06-12T21:34:59.477+08:00  INFO 418636 --- [springboot-movie] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-06-12T21:34:59.540+08:00  INFO 418636 --- [springboot-movie] [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
