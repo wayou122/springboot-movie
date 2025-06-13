@@ -95,6 +95,12 @@ public class MovieServiceImpl implements MovieService {
 		return movieRepository.findAllMovieCardsWithInterfaceProjection(userId, sort, typeFilterList, keyword, pageable);
 	}
 
+	// 電影標題
+	@Override
+	public List<MovieTitleDto> findAllMovieTitle(){
+		return movieRepository.findAllMovieTitleAndId();
+	}
+
 	// 新增電影
 	@Override
 	public void add(MovieDto movieDto) {

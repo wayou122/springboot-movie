@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
 		User user = userRepository.findByEmail(email)
 				.orElseThrow(() -> new UserNotFoundException("帳號尚未註冊"));
 		if (user.getEmailVerf()) {
-			throw new UserException("信箱已完成驗證");
+			return;
 		}
 		if (user.getEmailVerfToken() == null) {
 			throw new UserException("驗證碼已失效，請聯繫客服");

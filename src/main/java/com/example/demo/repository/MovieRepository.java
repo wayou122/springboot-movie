@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.example.demo.model.dto.MovieCardView;
+import com.example.demo.model.dto.MovieTitleDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,10 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>{
 	// 搜尋單一電影
 	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.movieId = :movieId")
 	Optional<Movie> findByIdWithReviews(Integer movieId);
+
+	//尋找所有電影名稱和id
+	@Query("SELECT m.movieId AS movieId, m.title AS title FROM Movie m")
+	List<MovieTitleDto> findAllMovieTitleAndId();
 
 	//搜尋電影卡
 	@Query("""

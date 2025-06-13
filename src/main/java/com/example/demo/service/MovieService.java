@@ -2,14 +2,11 @@ package com.example.demo.service;
 
 import java.util.List;
 
-import com.example.demo.model.dto.MovieCardView;
+import com.example.demo.model.dto.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import com.example.demo.model.dto.MovieDto;
-import com.example.demo.model.dto.MoviesFilterDto;
 import com.example.demo.model.entity.Movie;
-import com.example.demo.model.dto.MovieCardDto;
 
 public interface MovieService {
 
@@ -18,6 +15,8 @@ public interface MovieService {
 
 	void add(MovieDto movieDto);
 	void addAll(List<MovieDto> movieDtos);
+
+	List<MovieTitleDto> findAllMovieTitle();
 
 	List<MovieCardDto> findAll(Integer userId);
 	List<MovieCardDto> getFilteredMovies(MoviesFilterDto moviesFilterDto, Integer userId);

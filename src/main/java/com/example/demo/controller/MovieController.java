@@ -62,6 +62,13 @@ public class MovieController {
     return ResponseEntity.ok(ApiResponse.success(moviePage));
   }
 
+  // 取得電影標題
+  @GetMapping("/title")
+  public ResponseEntity<ApiResponse<List<MovieTitleDto>>> getAllTitle(){
+    List<MovieTitleDto> titles = movieService.findAllMovieTitle();
+    return ResponseEntity.ok(ApiResponse.success(titles));
+  }
+
   // 新增電影
   @PostMapping("/add")
   public ResponseEntity<ApiResponse<Void>> addMovie(
