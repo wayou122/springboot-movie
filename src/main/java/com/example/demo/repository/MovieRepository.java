@@ -101,5 +101,4 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>{
 	@Query("SELECT m FROM Movie m LEFT JOIN FETCH m.reviews")
 	List<Movie> findAllWithReviews();
 
-
 }
