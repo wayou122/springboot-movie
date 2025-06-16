@@ -1,10 +1,7 @@
 package com.example.demo.service.impl;
 
 import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.example.demo.exception.ParamsInvalidException;
@@ -69,7 +66,7 @@ public class ReviewServiceImpl implements ReviewService {
 	public void deleteReview(Integer reviewId, Integer userId) {
 		Review review = reviewRepository.findById(reviewId)
 				.orElseThrow(ReviewNotFoundException::new);
-		if(review.getUser().getUserId() != userId) {
+		if(!Objects.equals(review.getUser().getUserId(), userId)) {
 			throw new AccessInvalidException("沒有刪除權限");
 		}
 		reviewRepository.deleteById(reviewId);
@@ -80,7 +77,7 @@ public class ReviewServiceImpl implements ReviewService {
 	public void updateReview(ReviewDto reviewDto,Integer reviewId, Integer userId) {
 		Review review = reviewRepository.findById(reviewId)
 				.orElseThrow(ReviewNotFoundException::new);
-		if(review.getUser().getUserId() != userId) {
+		if(!Objects.equals(review.getUser().getUserId(), userId)) {
 			throw new AccessInvalidException("沒有修改權限");
 		}
 		review.setScore(reviewDto.getScore());

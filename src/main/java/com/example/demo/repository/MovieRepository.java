@@ -29,33 +29,33 @@ public interface MovieRepository extends JpaRepository<Movie, Integer>{
 
 	//搜尋電影卡
 	@Query("""
-    SELECT
-      m.movieId as movieId,
-      m.title as title,
-      m.releaseDate as releaseDate,
-      m.type as type,
-      m.length as length,
-      m.posterUrl as posterUrl,
-      m.bannerUrl as bannerUrl,
-      m.director as director,
-      m.actor as actor,
-      m.rating as rating,
-      COALESCE(AVG(r.score), 0) as scoreAvg,
-      COUNT(r.id) as reviewCount,
-      CASE WHEN :userId IS NOT NULL AND EXISTS (
-		     SELECT 1 FROM Movie m2 JOIN m2.watchlistUsers u
-		       WHERE m2.id = m.id AND u.id = :userId
-		     ) THEN true ELSE false END as collected
-    FROM Movie m
-    LEFT JOIN Review r ON r.movie = m
-    WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
-        AND (:keyword IS NULL OR m.title LIKE :keyword)
-    GROUP BY m.movieId
-    ORDER BY
-        CASE WHEN :sort = 'score_desc' THEN COALESCE(AVG(r.score), 0) END DESC,
-        CASE WHEN :sort = 'score_asc' THEN COALESCE(AVG(r.score), 0) END ASC,
-        CASE WHEN :sort = 'reviewCount_desc' THEN COUNT(r.id) END DESC,
-        m.releaseDate DESC, m.id ASC
+				SELECT
+						m.movieId as movieId,
+						m.title as title,
+						m.releaseDate as releaseDate,
+						m.type as type,
+						m.length as length,
+						m.posterUrl as posterUrl,
+						m.bannerUrl as bannerUrl,
+						m.director as director,
+						m.actor as actor,
+						m.rating as rating,
+						COALESCE(AVG(r.score), 0) as scoreAvg,
+						COUNT(r.id) as reviewCount,
+						CASE WHEN :userId IS NOT NULL AND EXISTS (
+						SELECT 1 FROM Movie m2 JOIN m2.watchlistUsers u
+									WHERE m2.id = m.id AND u.id = :userId
+							) THEN true ELSE false END as collected
+				FROM Movie m
+				LEFT JOIN Review r ON r.movie = m
+				WHERE (:typeFilter IS NULL OR m.type IN :typeFilter)
+								AND (:keyword IS NULL OR m.title LIKE :keyword)
+				GROUP BY m.movieId
+				ORDER BY
+								CASE WHEN :sort = 'score_desc' THEN COALESCE(AVG(r.score), 0) END DESC,
+								CASE WHEN :sort = 'score_asc' THEN COALESCE(AVG(r.score), 0) END ASC,
+								CASE WHEN :sort = 'reviewCount_desc' THEN COUNT(r.id) END DESC,
+								m.releaseDate DESC, m.id ASC
 	""")
 	Page<MovieCardView> findAllMovieCardsWithInterfaceProjection(
 			@Param("userId") Integer userId,

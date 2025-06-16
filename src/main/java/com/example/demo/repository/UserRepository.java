@@ -22,7 +22,5 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 	
 	@Query("SELECT w.movieId FROM User u JOIN u.watchlist w WHERE u.userId = :userId")
 	List<Integer> findWatchlistMovieIds(Integer userId);
-	
-//	@Query("SELECT m.movieId FROM Movie m JOIN m.watchlistUsers u WHERE u.userId = :userId")
-//	List<Integer> findWatchListMoveIdById(Integer userId);
+
 }
