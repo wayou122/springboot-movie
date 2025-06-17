@@ -67,7 +67,7 @@ public class UserController {
 	@PostMapping("/update-account")
 	public ResponseEntity<ApiResponse<UserDto>> updateAccount(
 			@RequestParam("username") String newUsername,
-			@RequestParam("image") MultipartFile image,
+			@RequestParam(name="image", required = false) MultipartFile image,
 			HttpSession httpSession){
 		if (httpSession.getAttribute("userCert") == null) {
 			return ResponseEntity.badRequest()
