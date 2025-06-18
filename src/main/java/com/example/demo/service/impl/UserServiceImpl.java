@@ -13,7 +13,6 @@ import java.util.UUID;
 
 import com.example.demo.exception.userException.PasswordTokenWrongException;
 import com.example.demo.exception.userException.UserException;
-import com.example.demo.model.dto.UserLoginDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,8 +31,6 @@ import com.example.demo.service.MovieService;
 import com.example.demo.service.UserService;
 import com.example.demo.util.Hash;
 import org.springframework.web.multipart.MultipartFile;
-
-import javax.mail.Multipart;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -177,8 +174,15 @@ public class UserServiceImpl implements UserService {
 		if (image == null) return;
 		User user = userRepository.findById(userId).orElseThrow(UserNotFoundException::new);
 		//建立新圖片
-		String filename = userId + "_" + image.getOriginalFilename();
-		Path filepath = Paths.get(uploadDir, filename);
+		String fileName = image.getOriginalFilename();
+		String extension = "";
+		if (fileName !=null && fileName.contains(".")){
+			extension = fileName.substring(fileName.lastIndexOf(".")).toLowerCase();
+		}else{
+			extension = ".jpg";
+		}
+		String savedFileName = userId + "_" + UUID.randomUUID().toString() + extension;
+		Path filepath = Paths.get(uploadDir, savedFileName);
 		try{
 			Files.createDirectories(filepath.getParent());
 			Files.write(filepath, image.getBytes());

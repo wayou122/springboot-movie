@@ -1,6 +1,7 @@
 package com.example.demo.service.impl;
 
 import com.example.demo.exception.userException.UserNotFoundException;
+import com.example.demo.mapper.ChatMessageMapper;
 import com.example.demo.model.dto.ChatMessageDto;
 import com.example.demo.model.entity.ChatMessage;
 import com.example.demo.model.entity.User;
@@ -17,40 +18,22 @@ public class ChatMessageServiceImpl implements ChatMessageService {
 
   @Autowired
   ChatMessageRepository chatMessageRepository;
-
   @Autowired
   UserRepository userRepository;
+  @Autowired
+  ChatMessageMapper chatMessageMapper;
 
   @Override //傳入user、room、content 回傳完整資訊
   public ChatMessageDto saveMessage(ChatMessageDto chatMessageDto) {
     User user = userRepository.findById(chatMessageDto.getUserId())
         .orElseThrow(UserNotFoundException::new);
-    ChatMessage chatMessage = toEntity(chatMessageDto, user);
+    ChatMessage chatMessage = chatMessageMapper.toEntity(chatMessageDto, user);
     chatMessageRepository.save(chatMessage);
-    return toDto(chatMessage);
+    return chatMessageMapper.toDto(chatMessage);
   }
 
   @Override
   public List<ChatMessageDto> getChatMessageByRoomName(String roomName) {
     return chatMessageRepository.getChatMessageByRoomName(roomName);
-  }
-
-  private ChatMessage toEntity(ChatMessageDto dto, User user){
-    ChatMessage chatMessage = new ChatMessage();
-    chatMessage.setUser(user);
-    chatMessage.setChatRoomName(dto.getChatRoomName());
-    chatMessage.setContent(dto.getContent());
-    return chatMessage;
-  }
-
-  private ChatMessageDto toDto(ChatMessage chatMessage){
-    ChatMessageDto dto = new ChatMessageDto();
-    dto.setUserId(chatMessage.getUser().getUserId());
-    dto.setUsername(chatMessage.getUser().getUsername());
-    dto.setUserImagePath(chatMessage.getUser().getImagePath());
-    dto.setCreatedDate(chatMessage.getCreatedDate());
-    dto.setChatRoomName(chatMessage.getChatRoomName());
-    dto.setContent(chatMessage.getContent());
-    return dto;
   }
 }

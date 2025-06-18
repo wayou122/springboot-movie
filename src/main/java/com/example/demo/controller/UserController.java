@@ -1,7 +1,10 @@
 package com.example.demo.controller;
 
 import java.io.IOException;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -69,6 +72,9 @@ public class UserController {
 			@RequestParam("username") String newUsername,
 			@RequestParam(name="image", required = false) MultipartFile image,
 			HttpSession httpSession){
+		if (!image.isEmpty()){
+			System.out.println("A");
+		}
 		if (httpSession.getAttribute("userCert") == null) {
 			return ResponseEntity.badRequest()
 					.body(ApiResponse.error(HttpStatus.BAD_REQUEST,"尚未登入"));
@@ -76,9 +82,10 @@ public class UserController {
 		UserCert userCert = (UserCert) httpSession.getAttribute("userCert");
 		Integer userId = userCert.getUserId();
 		userService.updateUsername(userId, newUsername);
+
     try {
       userService.updateImage(userId, image);
-    } catch (IOException e) {
+		} catch (IOException e) {
 			return ResponseEntity.badRequest().body(ApiResponse.error(HttpStatus.INTERNAL_SERVER_ERROR,"圖片上傳失敗"));
     }
     return ResponseEntity.ok(ApiResponse.success("修改成功",null));

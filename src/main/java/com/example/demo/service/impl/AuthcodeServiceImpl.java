@@ -19,9 +19,9 @@ public class AuthcodeServiceImpl implements AuthcodeService {
 
 	@Override
 	public String generateAuthcode() {
-		//String chars = "3456789abcdefghjkmnpqrstuvwxyABCDEFGHJKLMNPQRSTUVWXY";
-		String chars = "5";
-		int length = 1;
+		String chars = "3456789abcdefghjkmnpqrstuvwxyABCDEFGHJKLMNPQRSTUVWXY";
+		//String chars = "5";
+		int length = 4;
 		StringBuffer sb = new StringBuffer();
 		Random random = new Random();
 		for(int i=0; i<length; i++) {
@@ -60,9 +60,8 @@ public class AuthcodeServiceImpl implements AuthcodeService {
 			g.drawLine(x1,y1,x2,y2);
 		}
 		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ImageIO.write(img,"JPG",baos);			
-		byte[] bytes = baos.toByteArray();
-		return bytes;
+		ImageIO.write(img,"JPG",baos);
+    return baos.toByteArray();
 	}
 
 }
