@@ -101,6 +101,18 @@ public class MovieServiceImpl implements MovieService {
 		return movieRepository.findAllMovieTitleAndId();
 	}
 
+	// 尋找電影by標題
+	@Override
+	public MovieCardDto findMovieByTitle(String title, Integer userId){
+		if (userId != null && !userRepository.existsById(userId)) {
+			throw new UserNotFoundException();
+		}
+		String findTitle = "%"+title+"%";
+		Movie movie = movieRepository.findByTitle(findTitle)
+				.orElseThrow(MovieNotFoundException::new);
+		return toCardDto(movie,userId);
+	}
+
 	// 新增電影
 	@Override
 	public void add(MovieDto movieDto) {

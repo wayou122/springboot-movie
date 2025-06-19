@@ -19,6 +19,9 @@ import com.example.demo.model.entity.Movie;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Integer>{
 
+	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE title =:title")
+	Optional<Movie> findByTitle(String title);
+
 	// 搜尋單一電影
 	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.movieId = :movieId")
 	Optional<Movie> findByIdWithReviews(Integer movieId);

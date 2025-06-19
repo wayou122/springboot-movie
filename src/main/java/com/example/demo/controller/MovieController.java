@@ -55,7 +55,6 @@ public class MovieController {
     Integer userId = null;
     if (httpSession.getAttribute("userCert") != null) {
       userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
-      System.out.println(userId);
     }
     // 分頁查詢
     Page<MovieCardView> moviePage = movieService.getMoviePage(userId, page, sort, type, keyword);
@@ -67,6 +66,17 @@ public class MovieController {
   public ResponseEntity<ApiResponse<List<MovieTitleDto>>> getAllTitle(){
     List<MovieTitleDto> titles = movieService.findAllMovieTitle();
     return ResponseEntity.ok(ApiResponse.success(titles));
+  }
+
+  @GetMapping("/find")
+  public ResponseEntity<ApiResponse<MovieCardDto>> getMovieByTitle(@RequestParam String title, HttpSession httpSession){
+    //使用者資訊
+    Integer userId = null;
+    if (httpSession.getAttribute("userCert") != null) {
+      userId = ((UserCert) httpSession.getAttribute("userCert")).getUserId();
+    }
+    MovieCardDto dto = movieService.findMovieByTitle(title, userId);
+    return ResponseEntity.ok(ApiResponse.success(dto));
   }
 
   // 新增電影

@@ -13,6 +13,8 @@ public interface MovieService {
 	MovieDto findById(Integer movieId, Integer userId);
 	Page<MovieCardView> getMoviePage(Integer userId, String page, String sort, String type, String keyword);
 
+	MovieCardDto findMovieByTitle(String title, Integer userId);
+
 	void add(MovieDto movieDto);
 	void addAll(List<MovieDto> movieDtos);
 
