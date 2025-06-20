@@ -8,7 +8,6 @@ import com.example.demo.model.dto.MovieTitleDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -19,16 +18,20 @@ import com.example.demo.model.entity.Movie;
 @Repository
 public interface MovieRepository extends JpaRepository<Movie, Integer>{
 
-	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE title =:title")
-	Optional<Movie> findByTitle(String title);
-
 	// 搜尋單一電影
 	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE m.movieId = :movieId")
 	Optional<Movie> findByIdWithReviews(Integer movieId);
 
-	//尋找所有電影名稱和id
+	// 尋找所有電影名稱和id
 	@Query("SELECT m.movieId AS movieId, m.title AS title FROM Movie m")
 	List<MovieTitleDto> findAllMovieTitleAndId();
+
+	// 搜尋電影標題
+	@Query("SELECT DISTINCT m FROM Movie m LEFT JOIN FETCH m.reviews WHERE title LIKE :title")
+	Optional<Movie> findByTitle(String title);
+
+	@Query("SELECT m.title FROM Movie m WHERE m.title LIKE :keyword OR m.summary LIKE :keyword")
+	List<String> findByKeyword(String keyword);
 
 	//搜尋電影卡
 	@Query("""

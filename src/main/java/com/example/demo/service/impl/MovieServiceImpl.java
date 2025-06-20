@@ -113,6 +113,17 @@ public class MovieServiceImpl implements MovieService {
 		return toCardDto(movie,userId);
 	}
 
+	@Override
+	public List<String> findByKeyword(List<String> keywords){
+    for (String keyword : keywords) {
+      List<String> filteredMovies = movieRepository.findByKeyword("%"+keyword+"%");
+      if (!filteredMovies.isEmpty()) {
+        return filteredMovies;
+      }
+    }
+		return null;
+	}
+
 	// 新增電影
 	@Override
 	public void add(MovieDto movieDto) {

@@ -14,7 +14,7 @@ public interface MovieService {
 	Page<MovieCardView> getMoviePage(Integer userId, String page, String sort, String type, String keyword);
 
 	MovieCardDto findMovieByTitle(String title, Integer userId);
-
+	List<String> findByKeyword (List<String> keywords);
 	void add(MovieDto movieDto);
 	void addAll(List<MovieDto> movieDtos);
 
