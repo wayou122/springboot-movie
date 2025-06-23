@@ -1,6 +1,5 @@
 package com.example.demo.controller;
 
-import com.example.demo.repository.MovieRepository;
 import com.example.demo.service.MovieService;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
