@@ -35,7 +35,7 @@ public class AIChatController {
     List<String> filteredMovies = movieService.findByKeyword(keywords);
     String prompt = """
     我希望根據後面的關鍵字，從候選名單裡面推薦1部台灣電影。
-    請寫大約50字的推薦短文，電影名稱請用《》符號包起來，請直接寫推薦短文不用重複寫標題。
+    請寫大約50字的推薦短文，電影名稱請用《》符號包起來，請直接寫推薦短文不用重複關鍵字和回答前提。
     如果候選名單沒有電影則請根據你的模型推薦電影，但注意資訊真實性，不要推薦不存在的電影。
     如果關鍵字包含不雅字眼請回覆要求重新輸入。""" +
     "候選名單如下：" + filteredMovies +
